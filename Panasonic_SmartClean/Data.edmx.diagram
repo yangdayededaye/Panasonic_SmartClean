@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="969467e009ca40888923999bffc456ab" Name="Diagram1">
+        <EntityTypeShape EntityType="Panasonic_SmartCleanModel.CleanLog" Width="1.5" PointX="0.75" PointY="0.75" />
+        <EntityTypeShape EntityType="Panasonic_SmartCleanModel.Flow" Width="1.5" PointX="2.75" PointY="0.75" />
+        <EntityTypeShape EntityType="Panasonic_SmartCleanModel.Log" Width="1.5" PointX="2.75" PointY="3.75" />
+        <EntityTypeShape EntityType="Panasonic_SmartCleanModel.User" Width="1.5" PointX="4.75" PointY="0.75" />
+        <EntityTypeShape EntityType="Panasonic_SmartCleanModel.Warn" Width="1.5" PointX="4.75" PointY="4.75" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

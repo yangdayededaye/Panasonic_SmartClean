@@ -1,0 +1,599 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{99A735FF-C939-4A2C-A834-B6CF3778F024}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>Panasonic_SmartClean</RootNamespace>
+    <AssemblyName>Panasonic_SmartClean</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>SmartClean.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.Extended, Version=6.0.0.0, Culture=neutral, PublicKeyToken=05b7e29bdd433584, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.Extended.6.1.0.168\lib\net45\EntityFramework.Extended.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="FastReport">
+      <HintPath>.\FastReport.dll</HintPath>
+    </Reference>
+    <Reference Include="FastReport.Bars">
+      <HintPath>.\FastReport.Bars.dll</HintPath>
+    </Reference>
+    <Reference Include="FastReport.Editor">
+      <HintPath>.\FastReport.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="HslCommunication, Version=10.5.1.0, Culture=neutral, PublicKeyToken=3d72ad3b6b5ec0e3, processorArchitecture=MSIL">
+      <HintPath>..\packages\HslCommunication.10.5.1\lib\net451\HslCommunication.dll</HintPath>
+    </Reference>
+    <Reference Include="ImageSourceModuleCs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6a03c4a48a6df5e6, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\VisionMaster4.2.0\Development\V4.x\ComControls\Assembly\ImageSourceModuleCs.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.6.0.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Oracle.ManagedDataAccess, Version=4.122.21.1, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL">
+      <HintPath>..\packages\Oracle.ManagedDataAccess.21.6.1\lib\net462\Oracle.ManagedDataAccess.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="SunnyUI">
+      <HintPath>.\SunnyUI.dll</HintPath>
+    </Reference>
+    <Reference Include="SunnyUI.Common">
+      <HintPath>.\SunnyUI.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Text.Encodings.Web, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encodings.Web.6.0.0\lib\net461\System.Text.Encodings.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Json.6.0.0\lib\net461\System.Text.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="VM.Controls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=48472957e1d7b05f, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\VisionMaster4.2.0\Development\V4.x\ComControls\Assembly\VM.Controls.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="VM.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=61600122bc9264b9, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\VisionMaster4.2.0\Development\V4.x\ComControls\Assembly\VM.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="VM.PlatformSDKCS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=c1484a72052ee3d4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\VisionMaster4.2.0\Development\V4.x\ComControls\Assembly\VM.PlatformSDKCS.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="VMControls.Interface, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cb41614600cf774b, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\VisionMaster4.2.0\Development\V4.x\ComControls\Assembly\VMControls.Interface.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="VMControls.RenderInterface, Version=1.0.0.0, Culture=neutral, PublicKeyToken=4bcfc50547abbb24, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\VisionMaster4.2.0\Development\V4.x\ComControls\Assembly\VMControls.RenderInterface.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="VMControls.Winform.Release, Version=1.0.0.0, Culture=neutral, PublicKeyToken=2efa940dfee4dc7e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\VisionMaster4.2.0\Development\V4.x\ComControls\Assembly\VMControls.Winform.Release.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="WindowsFormsIntegration" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CleanLog.cs">
+      <DependentUpon>Data.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CommonUI\FChangePsw.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CommonUI\FChangePsw.Designer.cs">
+      <DependentUpon>FChangePsw.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CommonUI\FKeyBoardString.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CommonUI\FKeyBoardString.Designer.cs">
+      <DependentUpon>FKeyBoardString.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CommonUI\FKeyBoardNum.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CommonUI\FKeyBoardNum.Designer.cs">
+      <DependentUpon>FKeyBoardNum.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CommonUI\FLogin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CommonUI\FLogin.Designer.cs">
+      <DependentUpon>FLogin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CommonUI\FLoad.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CommonUI\FLoad.Designer.cs">
+      <DependentUpon>FLoad.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CommonUI\FUpdateLog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CommonUI\FUpdateLog.Designer.cs">
+      <DependentUpon>FUpdateLog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Config\SoftConfig.cs" />
+    <Compile Include="Data.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Data.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Data.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Data.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceUI\FAttention.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceUI\FAttention.Designer.cs">
+      <DependentUpon>FAttention.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceUI\FOState.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceUI\FOState.Designer.cs">
+      <DependentUpon>FOState.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceUI\FIState.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceUI\FIState.Designer.cs">
+      <DependentUpon>FIState.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceUI\FSelectType.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceUI\FSelectType.Designer.cs">
+      <DependentUpon>FSelectType.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceUI\FCleanNew.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceUI\FCleanNew.Designer.cs">
+      <DependentUpon>FCleanNew.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceUI\FrmKeyboard.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceUI\FrmKeyboard.Designer.cs" />
+    <Compile Include="DeviceUI\FFlow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceUI\FFlow.Designer.cs">
+      <DependentUpon>FFlow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceUI\FFlowInfo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceUI\FFlowInfo.Designer.cs">
+      <DependentUpon>FFlowInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceUI\FSetPositionSec.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceUI\FSetPositionSec.Designer.cs">
+      <DependentUpon>FSetPositionSec.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceUI\FSetPosition.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceUI\FSetPosition.Designer.cs">
+      <DependentUpon>FSetPosition.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceUI\FWarnList.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceUI\FWarnList.Designer.cs">
+      <DependentUpon>FWarnList.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceUI\FLogInfo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceUI\FLogInfo.Designer.cs">
+      <DependentUpon>FLogInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceUI\FMain_DeviceNew.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceUI\FMain_DeviceNew.Designer.cs">
+      <DependentUpon>FMain_DeviceNew.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceUI\FWarn.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceUI\FWarn.Designer.cs">
+      <DependentUpon>FWarn.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceUI\FCamera.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceUI\FCamera.Designer.cs">
+      <DependentUpon>FCamera.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceUI\FLog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceUI\FLog.Designer.cs">
+      <DependentUpon>FLog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceUI\FReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceUI\FReport.Designer.cs">
+      <DependentUpon>FReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceUI\FDataView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceUI\FDataView.Designer.cs">
+      <DependentUpon>FDataView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceUI\FUserInfo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceUI\FUserInfo.Designer.cs">
+      <DependentUpon>FUserInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceUI\FUser.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceUI\FUser.Designer.cs">
+      <DependentUpon>FUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceUI\FBlank.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceUI\FBlank.Designer.cs">
+      <DependentUpon>FBlank.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceUI\FSet.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceUI\FSet.Designer.cs">
+      <DependentUpon>FSet.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceUI\FInput.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceUI\FInput.Designer.cs">
+      <DependentUpon>FInput.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceUI\FPlc.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceUI\FPlc.Designer.cs">
+      <DependentUpon>FPlc.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceUI\FTest.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceUI\FTest.Designer.cs">
+      <DependentUpon>FTest.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Flow.cs">
+      <DependentUpon>Data.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Log.cs">
+      <DependentUpon>Data.tt</DependentUpon>
+    </Compile>
+    <Compile Include="MainViewControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="MainViewControl.Designer.cs">
+      <DependentUpon>MainViewControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Model\FlowModel.cs" />
+    <Compile Include="Model\IOModel.cs" />
+    <Compile Include="Model\WorkPiece.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RenderControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="RenderControl.Designer.cs">
+      <DependentUpon>RenderControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Service\CameraSocket.cs" />
+    <Compile Include="Service\Scan.cs" />
+    <Compile Include="Service\Hsl.cs" />
+    <Compile Include="Service\Mcu.cs" />
+    <Compile Include="Tool\AutoSizeCls.cs" />
+    <Compile Include="Tool\IniCls.cs" />
+    <Compile Include="Tool\LogCls.cs" />
+    <Compile Include="Model\UserModel.cs" />
+    <Compile Include="Tool\PyHelper.cs" />
+    <Compile Include="Tool\SqlHelper.cs" />
+    <Compile Include="Tool\Util.cs" />
+    <Compile Include="Tool\VoiceCls.cs" />
+    <Compile Include="uc_BoxBig.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="uc_BoxBig.Designer.cs">
+      <DependentUpon>uc_BoxBig.cs</DependentUpon>
+    </Compile>
+    <Compile Include="uc_BoxMiddle.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="uc_BoxMiddle.Designer.cs">
+      <DependentUpon>uc_BoxMiddle.cs</DependentUpon>
+    </Compile>
+    <Compile Include="uc_BoxSmall.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="uc_BoxSmall.Designer.cs">
+      <DependentUpon>uc_BoxSmall.cs</DependentUpon>
+    </Compile>
+    <Compile Include="User.cs">
+      <DependentUpon>Data.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Warn.cs">
+      <DependentUpon>Data.tt</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="CommonUI\FChangePsw.resx">
+      <DependentUpon>FChangePsw.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CommonUI\FKeyBoardString.resx">
+      <DependentUpon>FKeyBoardString.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CommonUI\FKeyBoardNum.resx">
+      <DependentUpon>FKeyBoardNum.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CommonUI\FLogin.resx">
+      <DependentUpon>FLogin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CommonUI\FLoad.resx">
+      <DependentUpon>FLoad.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CommonUI\FUpdateLog.resx">
+      <DependentUpon>FUpdateLog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceUI\FAttention.resx">
+      <DependentUpon>FAttention.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceUI\FOState.resx">
+      <DependentUpon>FOState.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceUI\FIState.resx">
+      <DependentUpon>FIState.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceUI\FSelectType.resx">
+      <DependentUpon>FSelectType.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceUI\FCleanNew.resx">
+      <DependentUpon>FCleanNew.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceUI\FrmKeyboard.resx" />
+    <EmbeddedResource Include="DeviceUI\FFlow.resx">
+      <DependentUpon>FFlow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceUI\FFlowInfo.resx">
+      <DependentUpon>FFlowInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceUI\FSetPositionSec.resx">
+      <DependentUpon>FSetPositionSec.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceUI\FSetPosition.resx">
+      <DependentUpon>FSetPosition.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceUI\FWarnList.resx">
+      <DependentUpon>FWarnList.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceUI\FLogInfo.resx">
+      <DependentUpon>FLogInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceUI\FMain_DeviceNew.resx">
+      <DependentUpon>FMain_DeviceNew.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceUI\FWarn.resx">
+      <DependentUpon>FWarn.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceUI\FCamera.resx">
+      <DependentUpon>FCamera.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceUI\FLog.resx">
+      <DependentUpon>FLog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceUI\FReport.resx">
+      <DependentUpon>FReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceUI\FDataView.resx">
+      <DependentUpon>FDataView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceUI\FUserInfo.resx">
+      <DependentUpon>FUserInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceUI\FUser.resx">
+      <DependentUpon>FUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceUI\FBlank.resx">
+      <DependentUpon>FBlank.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceUI\FSet.resx">
+      <DependentUpon>FSet.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceUI\FInput.resx">
+      <DependentUpon>FInput.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceUI\FPlc.resx">
+      <DependentUpon>FPlc.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceUI\FTest.resx">
+      <DependentUpon>FTest.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MainViewControl.resx">
+      <DependentUpon>MainViewControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="RenderControl.resx">
+      <DependentUpon>RenderControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="uc_BoxBig.resx">
+      <DependentUpon>uc_BoxBig.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="uc_BoxMiddle.resx">
+      <DependentUpon>uc_BoxMiddle.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="uc_BoxSmall.resx">
+      <DependentUpon>uc_BoxSmall.cs</DependentUpon>
+    </EmbeddedResource>
+    <EntityDeploy Include="Data.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>Data.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="Data.edmx.diagram">
+      <DependentUpon>Data.edmx</DependentUpon>
+    </None>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Dal\" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="SpeechLib">
+      <Guid>{C866CA3A-32F7-11D2-9602-00C04F8EE628}</Guid>
+      <VersionMajor>5</VersionMajor>
+      <VersionMinor>4</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Data.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>Data.edmx</DependentUpon>
+      <LastGenOutput>Data.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Data.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>Data.edmx</DependentUpon>
+      <LastGenOutput>Data.cs</LastGenOutput>
+    </Content>
+    <Content Include="SmartClean.ico" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\System.Text.Json.6.0.0\build\System.Text.Json.targets" Condition="Exists('..\packages\System.Text.Json.6.0.0\build\System.Text.Json.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>这台计算机上缺少此项目引用的 NuGet 程序包。使用“NuGet 程序包还原”可下载这些程序包。有关更多信息，请参见 http://go.microsoft.com/fwlink/?LinkID=322105。缺少的文件是 {0}。</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\System.Text.Json.6.0.0\build\System.Text.Json.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Text.Json.6.0.0\build\System.Text.Json.targets'))" />
+  </Target>
+</Project>
