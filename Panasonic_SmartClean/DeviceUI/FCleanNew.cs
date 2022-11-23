@@ -36,6 +36,7 @@ namespace Panasonic_SmartClean
 
         public ConcurrentQueue<string> CmdNeedRefresh = new ConcurrentQueue<string>();
         public ConcurrentQueue<string> CmdNeedAdd = new ConcurrentQueue<string>();
+        public ConcurrentQueue<ImageModel> CmdImage = new ConcurrentQueue<ImageModel>();
 
         private Bitmap ImageBaseDataToBitmap(ImageBaseData imageBaseData)
         {
@@ -189,10 +190,10 @@ namespace Panasonic_SmartClean
             //查询流量阈值
             SoftConfig.lstFlow = SoftConfig.db.Flow.Where(x => x.Ocr != "").ToList();
             ShowLog("获取到流量阈值记录："+SoftConfig.lstFlow.Count.ToString());
-
+            //异常/示意图/结束
             Task.Run(() =>
             {
-                ShowLog("异常检测流程已开启");
+                ShowLog("检测流程已开启");
                 while (true)
                 {
                     if (cts.Token.IsCancellationRequested)
@@ -360,14 +361,59 @@ namespace Panasonic_SmartClean
                     }
                     catch (Exception ex)
                     {
-                        ShowLog("监听线程异常:"+ex.Message,1);
+                        ShowLog("拍照解析|结束监听线程异常:"+ex.Message,1);
                     }
                     
                     Task.Delay(50);
 
                 }
             }, cts.Token);
+            //图片生成流程
+            Task.Run(() =>
+            {
+                ShowLog("图片生成流程已开启");
+                while (true)
+                {
+                    if (cts.Token.IsCancellationRequested)
+                    {
+                        return;
+                    }
 
+                    try
+                    {
+                        //写图片
+                        if (CmdImage.Count>0)
+                        {
+                            ImageModel im = new ImageModel();
+                            if (CmdImage.TryDequeue(out im))
+                            {
+                                if (File.Exists(im.path))
+                                {
+                                    ShowLog("图片已存在:" + im.path);
+                                    continue;
+                                }
+                                try
+                                {
+                                    im.img.Save(im.path);
+                                    ShowLog("保存图片成功:" + im.path);
+                                }
+                                catch (Exception ex)
+                                {
+                                    ShowLog("保存图片异常:" + im.path+" "+ex.Message);
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ShowLog("图片成功线程异常:" + ex.Message, 1);
+                    }
+
+                    Task.Delay(50);
+
+                }
+            }, cts.Token);
+            //20 30视觉触发流程
             Task.Run(() =>
             {
                 ShowLog("视觉请求检测流程已开启");
@@ -428,7 +474,7 @@ namespace Panasonic_SmartClean
                     }
                     catch (Exception ex)
                     {
-                        ShowLog("监听线程异常:" + ex.Message, 1);
+                        ShowLog("2030监听线程异常:" + ex.Message, 1);
                     }
 
                     Task.Delay(50);
@@ -2307,19 +2353,18 @@ namespace Panasonic_SmartClean
         {
             try
             {
-                if (File.Exists(strFile))
-                {
-                    ShowLog("图片已存在:" + strFile);
-                    return;
-                }
-                img.Save(strFile);
-                ShowLog("保存图片成功:" + strFile);
+                ImageModel im = new ImageModel();
+                im.img = img;
+                im.path = strFile;
+                CmdImage.Enqueue(im);
             }
             catch (Exception ex)
             {
-                ShowLog("保存图片失败:"+ex.Message+" "+strFile);
+                ShowLog("图片任务异常:"+ex.Message+" "+strFile);
             }
         }
+
+
 
         public void ShowLog(string strContext,int Type=0)
         {
@@ -4375,6 +4420,8 @@ namespace Panasonic_SmartClean
                         ledCheckNGResult.On = true;
                         break;
                 }
+                //读取流量
+                FlowCount.Text = hsl.ReadUShort("D5008",1)[0].ToString() + " ml/min";
                 //查询异常
                 hsl.SendCommand("check");
 

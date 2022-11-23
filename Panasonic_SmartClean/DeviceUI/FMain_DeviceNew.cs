@@ -82,39 +82,45 @@ namespace Panasonic_SmartClean
                     //设置图像源 调用拍照流程
                     ImageSourceModuleTool imageSourceToolBig = (ImageSourceModuleTool)VmSolution.Instance["大型.图像源1"];
                     imageSourceToolBig.ModuParams.ImageSourceType = ImageSourceParam.ImageSourceTypeEnum.LocalImage;
-                    imageSourceToolBig.ModuParams.SetParamValue("AddImage",System.Environment.CurrentDirectory+"\\PreLoad.jpg");
+                    imageSourceToolBig.AddInputImageByPath(System.Environment.CurrentDirectory + "\\PreLoadBig.jpg");
                     VmProcedure procedureBig = VmSolution.Instance["大型"] as VmProcedure;
                     procedureBig.OnWorkEndStatusCallBack += VmProcedure_OnWorkEndStatusCallBack;
-                    
+
                     ImageSourceModuleTool imageSourceToolSmall = (ImageSourceModuleTool)VmSolution.Instance["小型(上位机).图像源1"];
                     imageSourceToolSmall.ModuParams.ImageSourceType = ImageSourceParam.ImageSourceTypeEnum.LocalImage;
-                    imageSourceToolSmall.ModuParams.SetParamValue("AddImage", System.Environment.CurrentDirectory + "\\PreLoad.jpg");
+                    imageSourceToolSmall.AddInputImageByPath(System.Environment.CurrentDirectory + "\\PreLoadSmall.jpg");
                     VmProcedure procedureSmall = VmSolution.Instance["小型(上位机)"] as VmProcedure;
                     procedureSmall.OnWorkEndStatusCallBack += VmProcedure_OnWorkEndStatusCallBack;
 
                     if (procedureBig != null)
                     {
-                        procedureBig.Run();
+                        lg.SendCommand("调用大型", 0);
                         IsPreLoadFinish = false;
+                        procedureBig.Run();
                         while (!IsPreLoadFinish)
                         {
                             Task.Delay(500);
+                            lg.SendCommand("等待大型回调", 0);
                         }
                     }
-                    
+
                     if (procedureSmall != null)
                     {
-                        procedureSmall.Run();
+                        lg.SendCommand("调用小型", 0);
                         IsPreLoadFinish = false;
+                        procedureSmall.Run();
                         while (!IsPreLoadFinish)
                         {
                             Task.Delay(500);
+                            lg.SendCommand("等待小型回调", 0);
                         }
                     }
-                    
+
                     //更换图像源 注销回调
                     imageSourceToolBig.ModuParams.ImageSourceType = ImageSourceParam.ImageSourceTypeEnum.Camera;
+                    imageSourceToolBig.ModuParams.SetParamValue("CameraID","27");
                     imageSourceToolSmall.ModuParams.ImageSourceType = ImageSourceParam.ImageSourceTypeEnum.Camera;
+                    imageSourceToolSmall.ModuParams.SetParamValue("CameraID", "27");
                     procedureBig.OnWorkEndStatusCallBack -= VmProcedure_OnWorkEndStatusCallBack;
                     procedureSmall.OnWorkEndStatusCallBack -= VmProcedure_OnWorkEndStatusCallBack;
 
@@ -148,7 +154,7 @@ namespace Panasonic_SmartClean
                 if (procedure != null)
                 {
                     IsPreLoadFinish = true;
-                    lg.SendCommand("预加载回调",0);
+                    lg.SendCommand("收到预加载回调:"+procedure.FullName,0);
                 }
             }
             catch (Exception ex)
@@ -285,6 +291,12 @@ namespace Panasonic_SmartClean
         private void timerDateTime_Tick(object sender, EventArgs e)
         {
             lbTime.Text = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+            if (Hsl._connected&& lightPLC.State != UILightState.On)
+                lightPLC.State = UILightState.On;
+
+            if (!Hsl._connected && lightPLC.State != UILightState.Off)
+                lightPLC.State = UILightState.Off;
         }
 
         public int iTouchTime = 0;

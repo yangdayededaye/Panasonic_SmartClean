@@ -373,6 +373,7 @@
       <DependentUpon>MainViewControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Model\FlowModel.cs" />
+    <Compile Include="Model\ImageModel.cs" />
     <Compile Include="Model\IOModel.cs" />
     <Compile Include="Model\WorkPiece.cs" />
     <Compile Include="Program.cs" />

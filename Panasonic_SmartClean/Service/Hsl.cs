@@ -21,6 +21,8 @@ namespace Panasonic_SmartClean.Service
 
         private Thread th;
 
+        private Thread thCheckConnect;
+
         private ConcurrentQueue<string> CmdQueue = new ConcurrentQueue<string>();
 
         public static readonly Hsl Instance = new Hsl();
@@ -30,7 +32,7 @@ namespace Panasonic_SmartClean.Service
         public static volatile string Alarm = "";
 
         private MelsecMcNet melsec_net = null;
-        public bool _connected = false;
+        public static bool _connected = false;
 
         public bool[] bWarn = new bool[65];
 
@@ -206,6 +208,14 @@ namespace Panasonic_SmartClean.Service
 
                 if (Authorization.SetAuthorizationCode("e3e27344-1a9f-4d8b-b4fc-da5cae4b99bf"))
                 {
+                    th = new Thread(StartFunc);
+                    th.IsBackground = true;
+                    th.Start();
+
+                    thCheckConnect = new Thread(CheckConnect);
+                    thCheckConnect.IsBackground = true;
+                    thCheckConnect.Start();
+
                     melsec_net = new MelsecMcNet();
                     melsec_net.ConnectTimeOut = 2000;
                     melsec_net.IpAddress = ConfigurationManager.AppSettings["PlcIP"].ToString();
@@ -222,9 +232,9 @@ namespace Panasonic_SmartClean.Service
                     }
                 }
 
-                th = new Thread(StartFunc);
-                th.IsBackground = true;
-                th.Start();
+                
+
+                
 
                 return true;
             }
@@ -238,13 +248,67 @@ namespace Panasonic_SmartClean.Service
         {
             while (true)
             {
+                Thread.Sleep(200);
                 if (CmdQueue.Count>0)
                 {
-                    string strCmd = "";
-                    CmdQueue.TryDequeue(out strCmd);
-                    bWarn = ReadBool("M300", 67);
+                    try
+                    {
+                        string strCmd = "";
+                        CmdQueue.TryDequeue(out strCmd);
+                        bWarn = ReadBool("M300", 67);
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
                 }
-                Thread.Sleep(200);
+                
+            }
+        }
+
+        private void CheckConnect()
+        {
+            while (true)
+            {
+                Thread.Sleep(5000);
+
+                try
+                {
+                    OperateResult<UInt16[]> b = melsec_net.ReadUInt16("D5022", 1);
+                    _connected = true;
+                }
+                catch (Exception ex)
+                {
+                    log.SendCommand("PLC读取失败，开始重连", 1);
+                    _connected = false; ;
+                }
+                if (!_connected)//重连
+                {
+                    try
+                    {
+                        melsec_net = new MelsecMcNet();
+                        melsec_net.ConnectTimeOut = 2000;
+                        melsec_net.IpAddress = ConfigurationManager.AppSettings["PlcIP"].ToString();
+                        melsec_net.Port = int.Parse(ConfigurationManager.AppSettings["PlcPort"].ToString());
+                        OperateResult connect = melsec_net.ConnectServer();
+                        if (connect.IsSuccess)
+                        {
+                            _connected = true;
+                            log.SendCommand("重连PLC成功",0);
+                        }
+                        else
+                        {
+                            _connected = false;
+                            log.SendCommand("重连PLC失败", 1);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _connected = false;
+                        log.SendCommand("重连PLC失败", 1);
+                    }
+                }
+                
             }
         }
 

@@ -72,8 +72,11 @@ namespace Panasonic_SmartClean
 
         private void dv_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            FLogInfo f = new FLogInfo(dv.Rows[e.RowIndex].Cells[7].Value == null ? "" : dv.Rows[e.RowIndex].Cells[7].Value.ToString(), dv.Rows[e.RowIndex].Cells[8].Value == null ? "" : dv.Rows[e.RowIndex].Cells[8].Value.ToString(), dv.Rows[e.RowIndex].Cells[11].Value==null?"":dv.Rows[e.RowIndex].Cells[11].Value.ToString(), dv.Rows[e.RowIndex].Cells[12].Value==null?"": dv.Rows[e.RowIndex].Cells[12].Value.ToString(), dv.Rows[e.RowIndex].Cells[13].Value==null?"": dv.Rows[e.RowIndex].Cells[13].Value.ToString(), dv.Rows[e.RowIndex].Cells[14].Value==null?"": dv.Rows[e.RowIndex].Cells[14].Value.ToString());
-            f.ShowDialog();
+            if (e.RowIndex>=0)
+            {
+                FLogInfo f = new FLogInfo(dv.Rows[e.RowIndex].Cells[7].Value == null ? "" : dv.Rows[e.RowIndex].Cells[7].Value.ToString(), dv.Rows[e.RowIndex].Cells[8].Value == null ? "" : dv.Rows[e.RowIndex].Cells[8].Value.ToString(), dv.Rows[e.RowIndex].Cells[11].Value == null ? "" : dv.Rows[e.RowIndex].Cells[11].Value.ToString(), dv.Rows[e.RowIndex].Cells[12].Value == null ? "" : dv.Rows[e.RowIndex].Cells[12].Value.ToString(), dv.Rows[e.RowIndex].Cells[13].Value == null ? "" : dv.Rows[e.RowIndex].Cells[13].Value.ToString(), dv.Rows[e.RowIndex].Cells[14].Value == null ? "" : dv.Rows[e.RowIndex].Cells[14].Value.ToString());
+                f.ShowDialog();
+            }
         }
 
     }

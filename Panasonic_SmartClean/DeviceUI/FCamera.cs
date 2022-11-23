@@ -244,6 +244,11 @@ namespace Panasonic_SmartClean
 
                 }
             }
+            else
+            {
+                Close();
+            }
+
         }
     }
 }
