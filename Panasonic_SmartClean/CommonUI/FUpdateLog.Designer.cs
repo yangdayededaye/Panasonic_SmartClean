@@ -7,11 +7,13 @@
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
+#pragma warning disable CS0115 // “FUpdateLog.Dispose(bool)”: 没有找到适合的方法来重写
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
+#pragma warning restore CS0115 // “FUpdateLog.Dispose(bool)”: 没有找到适合的方法来重写
         {
             if (disposing && (components != null))
             {

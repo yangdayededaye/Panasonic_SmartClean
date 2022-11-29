@@ -7,11 +7,13 @@
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
+#pragma warning disable CS0115 // “FDataView.Dispose(bool)”: 没有找到适合的方法来重写
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
+#pragma warning restore CS0115 // “FDataView.Dispose(bool)”: 没有找到适合的方法来重写
         {
             if (disposing && (components != null))
             {
@@ -141,9 +143,17 @@
 
         #endregion
 
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UISymbolButton”(是否缺少程序集引用?)
         private Sunny.UI.UISymbolButton chart;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UISymbolButton”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UISymbolButton”(是否缺少程序集引用?)
         private Sunny.UI.UISymbolButton exit;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UISymbolButton”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UISymbolButton”(是否缺少程序集引用?)
         private Sunny.UI.UISymbolButton log;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UISymbolButton”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UISymbolButton”(是否缺少程序集引用?)
         private Sunny.UI.UISymbolButton warn;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UISymbolButton”(是否缺少程序集引用?)
     }
 }

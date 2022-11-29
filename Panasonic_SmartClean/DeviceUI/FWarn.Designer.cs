@@ -7,11 +7,13 @@
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
+#pragma warning disable CS0115 // “FWarn.Dispose(bool)”: 没有找到适合的方法来重写
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
+#pragma warning restore CS0115 // “FWarn.Dispose(bool)”: 没有找到适合的方法来重写
         {
             if (disposing && (components != null))
             {
@@ -935,73 +937,209 @@
         }
 
         #endregion
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel4;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb1;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel1;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb2;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel2;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb3;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel3;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb4;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel5;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb5;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel6;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb6;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel7;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb7;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel8;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb8;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel9;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb9;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel10;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb10;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel11;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb11;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel12;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb12;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel13;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb13;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel14;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb14;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel15;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb15;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel16;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb16;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel17;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb17;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel18;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb18;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel19;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb19;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel20;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb20;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel21;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb21;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel22;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb22;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel23;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb23;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel24;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb24;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel25;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb25;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel26;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb26;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel27;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb27;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel28;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb28;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel29;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb29;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel30;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb30;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel31;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb31;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel32;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb32;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel33;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb33;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel uiLabel34;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
         private Sunny.UI.UILedBulb uiLedBulb34;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILedBulb”(是否缺少程序集引用?)
     }
 }

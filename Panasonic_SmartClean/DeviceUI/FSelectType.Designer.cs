@@ -7,11 +7,13 @@
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
+#pragma warning disable CS0115 // “FSelectType.Dispose(bool)”: 没有找到适合的方法来重写
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
+#pragma warning restore CS0115 // “FSelectType.Dispose(bool)”: 没有找到适合的方法来重写
         {
             if (disposing && (components != null))
             {
@@ -170,9 +172,17 @@
 
         #endregion
 
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UIButton”(是否缺少程序集引用?)
         private Sunny.UI.UIButton btnSmall;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UIButton”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UIButton”(是否缺少程序集引用?)
         private Sunny.UI.UIButton btnBig;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UIButton”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UIButton”(是否缺少程序集引用?)
         private Sunny.UI.UIButton btnSuperBig;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UIButton”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UIButton”(是否缺少程序集引用?)
         private Sunny.UI.UIButton uiButton1;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UIButton”(是否缺少程序集引用?)
     }
 }

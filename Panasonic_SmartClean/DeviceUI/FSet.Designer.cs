@@ -7,11 +7,13 @@
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
+#pragma warning disable CS0115 // “FSet.Dispose(bool)”: 没有找到适合的方法来重写
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
+#pragma warning restore CS0115 // “FSet.Dispose(bool)”: 没有找到适合的方法来重写
         {
             if (disposing && (components != null))
             {
@@ -42,6 +44,7 @@
             this.uiGroupBox4 = new Sunny.UI.UIGroupBox();
             this.lbImagePath = new Sunny.UI.UILabel();
             this.btnImagePath = new Sunny.UI.UISymbolButton();
+            this.btnVisonProcess = new Sunny.UI.UISymbolButton();
             this.uiGroupBox1.SuspendLayout();
             this.uiGroupBox2.SuspendLayout();
             this.uiGroupBox3.SuspendLayout();
@@ -146,7 +149,7 @@
             // 
             this.cbBeforeEnable.Cursor = System.Windows.Forms.Cursors.Hand;
             this.cbBeforeEnable.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.cbBeforeEnable.Location = new System.Drawing.Point(76, 388);
+            this.cbBeforeEnable.Location = new System.Drawing.Point(77, 434);
             this.cbBeforeEnable.MinimumSize = new System.Drawing.Size(1, 1);
             this.cbBeforeEnable.Name = "cbBeforeEnable";
             this.cbBeforeEnable.Padding = new System.Windows.Forms.Padding(22, 0, 0, 0);
@@ -262,10 +265,28 @@
             this.btnImagePath.ZoomScaleRect = new System.Drawing.Rectangle(0, 0, 0, 0);
             this.btnImagePath.Click += new System.EventHandler(this.btnImagePath_Click);
             // 
+            // btnVisonProcess
+            // 
+            this.btnVisonProcess.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnVisonProcess.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.btnVisonProcess.Location = new System.Drawing.Point(59, 353);
+            this.btnVisonProcess.MinimumSize = new System.Drawing.Size(1, 1);
+            this.btnVisonProcess.Name = "btnVisonProcess";
+            this.btnVisonProcess.Radius = 20;
+            this.btnVisonProcess.Size = new System.Drawing.Size(168, 40);
+            this.btnVisonProcess.Style = Sunny.UI.UIStyle.Custom;
+            this.btnVisonProcess.Symbol = 61550;
+            this.btnVisonProcess.TabIndex = 286;
+            this.btnVisonProcess.Text = "视觉流程设置";
+            this.btnVisonProcess.TipsFont = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.btnVisonProcess.ZoomScaleRect = new System.Drawing.Rectangle(0, 0, 0, 0);
+            this.btnVisonProcess.Click += new System.EventHandler(this.btnVisonProcess_Click);
+            // 
             // FSet
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(945, 600);
+            this.Controls.Add(this.btnVisonProcess);
             this.Controls.Add(this.uiGroupBox4);
             this.Controls.Add(this.uiGroupBox3);
             this.Controls.Add(this.cbBeforeEnable);
@@ -292,19 +313,44 @@
         }
 
         #endregion
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UIIntegerUpDown”(是否缺少程序集引用?)
         private Sunny.UI.UIIntegerUpDown SaveDays;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UIIntegerUpDown”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UIGroupBox”(是否缺少程序集引用?)
         private Sunny.UI.UIGroupBox uiGroupBox1;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UIGroupBox”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UIGroupBox”(是否缺少程序集引用?)
         private Sunny.UI.UIGroupBox uiGroupBox2;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UIGroupBox”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UISymbolButton”(是否缺少程序集引用?)
         private Sunny.UI.UISymbolButton btnSelectSol;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UISymbolButton”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel lbTitle;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UISymbolButton”(是否缺少程序集引用?)
         private Sunny.UI.UISymbolButton btnFlowSet;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UISymbolButton”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UICheckBox”(是否缺少程序集引用?)
         private Sunny.UI.UICheckBox cbBeforeEnable;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UICheckBox”(是否缺少程序集引用?)
         private System.Windows.Forms.Button button4;
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UITextBox”(是否缺少程序集引用?)
         private Sunny.UI.UITextBox uiTextBox5;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UITextBox”(是否缺少程序集引用?)
         private System.Windows.Forms.Button button31;
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UIGroupBox”(是否缺少程序集引用?)
         private Sunny.UI.UIGroupBox uiGroupBox3;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UIGroupBox”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UIGroupBox”(是否缺少程序集引用?)
         private Sunny.UI.UIGroupBox uiGroupBox4;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UIGroupBox”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
         private Sunny.UI.UILabel lbImagePath;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UILabel”(是否缺少程序集引用?)
+#pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UISymbolButton”(是否缺少程序集引用?)
         private Sunny.UI.UISymbolButton btnImagePath;
+        private Sunny.UI.UISymbolButton btnVisonProcess;
+#pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UISymbolButton”(是否缺少程序集引用?)
     }
 }

@@ -60,6 +60,16 @@
           <Property Name="UserType" Type="varchar" MaxLength="50" />
           <Property Name="State" Type="char" MaxLength="1" />
         </EntityType>
+        <EntityType Name="VisonProcess">
+          <Key>
+            <PropertyRef Name="ProcessIndex" />
+          </Key>
+          <Property Name="ProcessIndex" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ProcessID" Type="varchar" MaxLength="50" />
+          <Property Name="ProcessName" Type="varchar" MaxLength="100" />
+          <Property Name="Type" Type="varchar" MaxLength="50" />
+          <Property Name="Remark" Type="varchar" MaxLength="255" />
+        </EntityType>
         <EntityType Name="Warn">
           <Key>
             <PropertyRef Name="WarnIndex" />
@@ -74,6 +84,7 @@
           <EntitySet Name="Flow" EntityType="Self.Flow" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Log" EntityType="Self.Log" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="User" EntityType="Self.User" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="VisonProcess" EntityType="Self.VisonProcess" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Warn" EntityType="Self.Warn" Schema="dbo" store:Type="Tables" />
         </EntityContainer>
       </Schema></edmx:StorageModels>
@@ -85,6 +96,7 @@
           <EntitySet Name="Flow" EntityType="Panasonic_SmartCleanModel.Flow" />
           <EntitySet Name="Log" EntityType="Panasonic_SmartCleanModel.Log" />
           <EntitySet Name="User" EntityType="Panasonic_SmartCleanModel.User" />
+          <EntitySet Name="VisonProcess" EntityType="Panasonic_SmartCleanModel.VisonProcess" />
           <EntitySet Name="Warn" EntityType="Panasonic_SmartCleanModel.Warn" />
         </EntityContainer>
         <EntityType Name="CleanLog">
@@ -141,6 +153,16 @@
           <Property Name="UserSex" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="UserType" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="State" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
+        </EntityType>
+        <EntityType Name="VisonProcess">
+          <Key>
+            <PropertyRef Name="ProcessIndex" />
+          </Key>
+          <Property Name="ProcessIndex" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ProcessID" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ProcessName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Type" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Remark" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="Warn">
           <Key>
@@ -213,6 +235,17 @@
                 <ScalarProperty Name="UserName" ColumnName="UserName" />
                 <ScalarProperty Name="UserCode" ColumnName="UserCode" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="VisonProcess">
+            <EntityTypeMapping TypeName="Panasonic_SmartCleanModel.VisonProcess">
+              <MappingFragment StoreEntitySet="VisonProcess">
+                <ScalarProperty Name="Remark" ColumnName="Remark" />
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="ProcessName" ColumnName="ProcessName" />
+                <ScalarProperty Name="ProcessID" ColumnName="ProcessID" />
+                <ScalarProperty Name="ProcessIndex" ColumnName="ProcessIndex" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

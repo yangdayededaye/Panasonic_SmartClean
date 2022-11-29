@@ -31,6 +31,8 @@ namespace Panasonic_SmartClean
         public static List<WorkPiece> lstWorkPiece = new List<WorkPiece>();
         //流量阈值集合
         public static List<Flow> lstFlow = new List<Flow>();
+        //流程集合
+        public static List<VisonProcess> lstProcess = new List<VisonProcess>();
 
         public static string ImagePath = "";
         public static int iLogCount = 0;

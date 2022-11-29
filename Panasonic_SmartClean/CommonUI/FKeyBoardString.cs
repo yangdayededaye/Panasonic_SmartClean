@@ -11,7 +11,9 @@ using System.Windows.Forms;
 
 namespace Panasonic_SmartClean
 {
+#pragma warning disable CS0246 // 未能找到类型或命名空间名“UIForm”(是否缺少 using 指令或程序集引用?)
     public partial class FKeyBoardString : UIForm
+#pragma warning restore CS0246 // 未能找到类型或命名空间名“UIForm”(是否缺少 using 指令或程序集引用?)
     {
         public string output
         {

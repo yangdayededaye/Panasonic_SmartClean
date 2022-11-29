@@ -29,6 +29,7 @@ namespace Panasonic_SmartClean
         public virtual DbSet<Flow> Flow { get; set; }
         public virtual DbSet<Log> Log { get; set; }
         public virtual DbSet<User> User { get; set; }
+        public virtual DbSet<VisonProcess> VisonProcess { get; set; }
         public virtual DbSet<Warn> Warn { get; set; }
     }
 }

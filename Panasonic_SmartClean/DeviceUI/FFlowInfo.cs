@@ -13,7 +13,9 @@ using System.Windows.Forms;
 
 namespace Panasonic_SmartClean.DeviceUI
 {
+#pragma warning disable CS0246 // 未能找到类型或命名空间名“UIForm”(是否缺少 using 指令或程序集引用?)
     public partial class FFlowInfo : UIForm
+#pragma warning restore CS0246 // 未能找到类型或命名空间名“UIForm”(是否缺少 using 指令或程序集引用?)
     {
         public FlowCls u = null;
         public FFlowInfo(FlowCls _u)

@@ -190,6 +190,51 @@ namespace Panasonic_SmartClean
             //查询流量阈值
             SoftConfig.lstFlow = SoftConfig.db.Flow.Where(x => x.Ocr != "").ToList();
             ShowLog("获取到流量阈值记录："+SoftConfig.lstFlow.Count.ToString());
+            //查询流程
+            SoftConfig.lstProcess = SoftConfig.db.VisonProcess.Where(x => x.ProcessID != "").ToList();
+            ShowLog("获取到视觉流程记录：" + SoftConfig.lstProcess.Count.ToString());
+            //示意图
+            Task.Run(() =>
+            {
+                ShowLog("检测流程已开启");
+                while (true)
+                {
+                    if (cts.Token.IsCancellationRequested)
+                    {
+                        return;
+                    }
+
+                    try
+                    {
+                        
+
+                        //刷新示意图
+                        if (CmdNeedRefresh.Count > 0)
+                        {
+                            string strResult = "";
+                            if (CmdNeedRefresh.TryDequeue(out strResult))
+                            {
+                                try
+                                {
+                                    RefreshMap();
+                                }
+                                catch (Exception ex)
+                                {
+                                    ShowLog("刷新示意图异常:" + ex.Message + " " + GetIndexString(), 1);
+                                }
+                            }
+                        }
+                        
+                    }
+                    catch (Exception)
+                    {
+
+                    }
+
+                    Task.Delay(50);
+
+                }
+            }, cts.Token);
             //异常/示意图/结束
             Task.Run(() =>
             {
@@ -281,22 +326,6 @@ namespace Panasonic_SmartClean
                             f.ShowDialog();
                         }
 
-                        //刷新示意图
-                        if (CmdNeedRefresh.Count > 0)
-                        {
-                            string strResult = "";
-                            if (CmdNeedRefresh.TryDequeue(out strResult))
-                            {
-                                try
-                                {
-                                    RefreshMap();
-                                }
-                                catch (Exception ex)
-                                {
-                                    ShowLog("刷新示意图异常:" + ex.Message + " " + GetIndexString(), 1);
-                                }
-                            }
-                        }
                         //复位
                         if (hsl.ReadBool("M55", 1)[0])
                         {
@@ -846,36 +875,57 @@ namespace Panasonic_SmartClean
         {
             try
             {
-                if (workStatusInfo.nWorkStatus == 1)
+                string ProcessID = workStatusInfo.nProcessID.ToString();
+                var vProcess = SoftConfig.lstProcess.Where(x => x.ProcessID == ProcessID).ToList();
+                if (vProcess==null||vProcess.Count<=0)
                 {
-                    if (workStatusInfo.nProcessID==10006|| workStatusInfo.nProcessID == 10007)
-                    {
-                        Task.Run(()=> {
-                            Thread.Sleep(1000);
-                            Invoke(new Action(() => {
-                                VmProcedure vp = GetProcessByID(workStatusInfo.nProcessID);
-                                vmRenderControl1.ModuleSource = vp;
-                            }));
-                        });
-                    }
-                    else
-                    {
-                        Invoke(new Action(() => {
-                            VmProcedure vp = GetProcessByID(workStatusInfo.nProcessID);
-                            vmRenderControl1.ModuleSource = vp;
-                        }));
-                    }
+                    ShowLog("未知视觉流程请注意添加:"+ ProcessID, 1);
+                    return;
                 }
-                else if(workStatusInfo.nWorkStatus == 0)
+                else
                 {
-                    switch (workStatusInfo.nProcessID)
+                    if (workStatusInfo.nWorkStatus == 1)
                     {
-                        case 10003:
-                            //小型工位拍照
-                            if (workStatusInfo.nWorkStatus == 0)//为了折叠
-                            {
+                        switch (vProcess[0].Type)
+                        {
+                            case "反光板清洗前":
+                                Task.Run(() => {
+                                    Thread.Sleep(1000);
+                                    Invoke(new Action(() => {
+                                        VmProcedure vp = GetProcessByID(workStatusInfo.nProcessID);
+                                        vmRenderControl1.ModuleSource = vp;
+                                    }));
+                                });
+                                break;
+                            case "反光板清洗后":
+                                Task.Run(() => {
+                                    Thread.Sleep(1000);
+                                    Invoke(new Action(() => {
+                                        VmProcedure vp = GetProcessByID(workStatusInfo.nProcessID);
+                                        vmRenderControl1.ModuleSource = vp;
+                                    }));
+                                });
+                                break;
+                            default:
+                                Invoke(new Action(() => {
+                                    VmProcedure vp = GetProcessByID(workStatusInfo.nProcessID);
+                                    vmRenderControl1.ModuleSource = vp;
+                                }));
+                                break;
+                        }
+                    }
+                    else if (workStatusInfo.nWorkStatus == 0)
+                    {
+                        List<VmDynamicIODefine.IoNameInfo> ioNameInfos;
+                        int iIndex = -1;
+                        WorkPiece wp;
+                        int iWorkPieceIndex = -1;
+
+                        switch (vProcess[0].Type)
+                        {
+                            case "小型":
                                 CurrentType = EWorkPieceType.small;
-                                List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+                                ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
                                 if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
                                 {
                                     if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
@@ -884,31 +934,23 @@ namespace Panasonic_SmartClean
                                         string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
                                         if (strResult != null)
                                         {
-                                            ShowLog("10003小型工位拍照获取结果:" + strResult, 0);
+                                            ShowLog("小型工位拍照获取结果:" + strResult, 0);
                                             //解析输出
                                             CmdNeedAdd.Enqueue(strResult);
-                                            Invoke(new Action(()=> {
+                                            Invoke(new Action(() => {
                                                 btnType.Text = "小型";
                                             }));
                                         }
                                         else
                                         {
-                                            ShowLog("10003小型工位拍照获取结果失败：结果为空!", 1);
+                                            ShowLog("小型工位拍照获取结果失败：结果为空!", 1);
                                         }
                                     }
                                 }
-                                else
-                                {
-                                    //strMessage = "获取结果失败：流程结果个数为0!";
-                                }
-                            }
-                            break;
-                        case 10004:
-                            //大型工位拍照
-                            if (workStatusInfo.nWorkStatus == 0)//流程空闲且为流程
-                            {
+                                break;
+                            case "大型":
                                 CurrentType = EWorkPieceType.big;
-                                List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+                                ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
                                 if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
                                 {
                                     if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
@@ -917,7 +959,7 @@ namespace Panasonic_SmartClean
                                         string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
                                         if (strResult != null)
                                         {
-                                            ShowLog("10004大型工位拍照获取结果:" + strResult, 0);
+                                            ShowLog("大型工位拍照获取结果:" + strResult, 0);
                                             //解析输出
                                             CmdNeedAdd.Enqueue(strResult);
                                             Invoke(new Action(() => {
@@ -926,88 +968,41 @@ namespace Panasonic_SmartClean
                                         }
                                         else
                                         {
-                                            ShowLog("10004大型工位拍照获取结果失败：结果为空!", 1);
+                                            ShowLog("大型工位拍照获取结果失败：结果为空!", 1);
                                             //strMessage = "获取结果失败：结果为空!";
                                         }
                                     }
                                 }
-                                else
-                                {
-                                    //strMessage = "获取结果失败：流程结果个数为0!";
-                                }
-                            }
-                            break;
-                        case 10005:
-                            //超大型工位拍照
-                            if (workStatusInfo.nWorkStatus == 0)//流程空闲且为流程
-                            {
-                                CurrentType = EWorkPieceType.superbig;
-                                List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
-                                if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
-                                {
-                                    if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
-                                    {
-                                        //获取流程结果
-                                        string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
-                                        if (strResult != null)
-                                        {
-                                            ShowLog("10005超大型工位拍照获取结果:" + strResult, 0);
-                                            //解析输出
-                                            CmdNeedAdd.Enqueue(strResult);
-                                            Invoke(new Action(() => {
-                                                btnType.Text = "超大型";
-                                            }));
-                                        }
-                                        else
-                                        {
-                                            ShowLog("10005超大型工位拍照获取结果失败：结果为空!", 1);
-                                            //strMessage = "获取结果失败：结果为空!";
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    //strMessage = "获取结果失败：流程结果个数为0!";
-                                }
-                            }
-                            break;
-
-                        case 10008:
-                            //喷嘴清洗前
-                            if (workStatusInfo.nWorkStatus == 0)
-                            {
-                                ShowLog("收到喷嘴清洗前回调");
-                                int iIndex = hsl.ReadUShort("D3019", 1)[0];
-                                WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
+                                break;
+                            case "吸嘴清洗前":
+                                ShowLog("收到吸嘴清洗前回调");
+                                iIndex = hsl.ReadUShort("D3019", 1)[0];
+                                wp = SoftConfig.lstWorkPiece.Where(x => x.Index == iIndex).FirstOrDefault();
                                 if (wp == null)
                                 {
-                                    ShowLog("喷嘴清洗前未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+                                    ShowLog("吸嘴清洗前未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
                                     return;
                                 }
                                 Task.Run(() => {
                                     Invoke(new Action(() => {
-                                        ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["吸嘴前.图像源1"];
+                                        ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance[vProcess[0].ProcessName+".图像源1"];
                                         ImageBaseData pic = tool.ModuResult.ImageData;
                                         Image img = ImageBaseDataToBitmap(pic);
                                         wp.MouseBefore = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_1.jpg";
-                                        SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseBefore);
+                                        SaveImage(img, SoftConfig.ImagePath + "\\" + wp.MouseBefore);
                                     }));
                                 });
-                            }
-                            break;
-                        case 10020:
-                            //喷嘴检测结果235CN
-                            if (workStatusInfo.nWorkStatus == 0)
-                            {
-                                int iIndex = hsl.ReadUShort("D3019", 1)[0];
-                                WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
+                                break;
+                            case "吸嘴清洗后":
+                                iIndex = hsl.ReadUShort("D3019", 1)[0];
+                                wp = SoftConfig.lstWorkPiece.Where(x => x.Index == iIndex).FirstOrDefault();
                                 if (wp == null)
                                 {
-                                    ShowLog("喷嘴清洗后235CN未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+                                    ShowLog("吸嘴清洗后 "+ vProcess[0].ProcessName + " 未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
                                     return;
                                 }
-                                int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
-                                List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+                                iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
+                                ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
                                 if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
                                 {
                                     if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
@@ -1015,1069 +1010,7 @@ namespace Panasonic_SmartClean
 
                                         Task.Run(() => {
                                             Invoke(new Action(() => {
-                                                ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["235CN.图像源1"];
-                                                ImageBaseData pic = tool.ModuResult.ImageData;
-                                                Image img = ImageBaseDataToBitmap(pic);
-                                                wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
-                                                SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
-                                                
-                                            }));
-                                        });
-
-                                        //获取流程结果
-                                        string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
-                                        if (strResult != null)
-                                        {
-                                            //实时显示结果
-                                            Invoke(new Action(() => {
-                                                MouseResult.Text = strResult == "OK" ? "OK" : "NG";
-                                                MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
-                                            }));
-                                            ShowLog("10020获取喷嘴检测结果:" + strResult, 0);
-                                            SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
-                                        }
-                                        else
-                                        {
-                                            ShowLog("10020获取喷嘴检测结果失败：结果为空!", 1);
-                                            //strMessage = "获取结果失败：结果为空!";
-                                        }
-                                    }
-                                }
-
-                            }
-                            break;
-                        case 10019:
-                            //喷嘴检测结果230CN
-                            if (workStatusInfo.nWorkStatus == 0)
-                            {
-                                int iIndex = hsl.ReadUShort("D3019", 1)[0];
-                                WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
-                                if (wp == null)
-                                {
-                                    ShowLog("喷嘴清洗后230CN未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
-                                    return;
-                                }
-                                int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
-                                List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
-                                if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
-                                {
-                                    if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
-                                    {
-
-                                        Task.Run(() => {
-                                            Invoke(new Action(() => {
-                                                ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["230CN.图像源1"];
-                                                ImageBaseData pic = tool.ModuResult.ImageData;
-                                                Image img = ImageBaseDataToBitmap(pic);
-                                                wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
-                                                SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
-                                                
-                                            }));
-                                        });
-
-                                        //获取流程结果
-                                        string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
-                                        if (strResult != null)
-                                        {
-                                            //实时显示结果
-                                            Invoke(new Action(() => {
-                                                MouseResult.Text = strResult == "OK" ? "OK" : "NG";
-                                                MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
-                                            }));
-                                            ShowLog("10019获取喷嘴检测结果:" + strResult, 0);
-                                            SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
-                                        }
-                                        else
-                                        {
-                                            ShowLog("10019获取喷嘴检测结果失败：结果为空!", 1);
-                                            //strMessage = "获取结果失败：结果为空!";
-                                        }
-                                    }
-                                }
-
-                            }
-                            break;
-                        case 10028:
-                            //喷嘴检测结果240CN
-                            if (workStatusInfo.nWorkStatus == 0)
-                            {
-                                int iIndex = hsl.ReadUShort("D3019", 1)[0];
-                                WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
-                                if (wp == null)
-                                {
-                                    ShowLog("喷嘴清洗后240CN未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
-                                    return;
-                                }
-                                int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
-                                List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
-                                if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
-                                {
-                                    if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
-                                    {
-
-                                        Task.Run(() => {
-                                            Invoke(new Action(() => {
-                                                ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["240CN.图像源1"];
-                                                ImageBaseData pic = tool.ModuResult.ImageData;
-                                                Image img = ImageBaseDataToBitmap(pic);
-                                                wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
-                                                SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
-                                                
-                                            }));
-                                        });
-
-                                        //获取流程结果
-                                        string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
-                                        if (strResult != null)
-                                        {
-                                            //实时显示结果
-                                            Invoke(new Action(() => {
-                                                MouseResult.Text = strResult == "OK" ? "OK" : "NG";
-                                                MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
-                                            }));
-                                            ShowLog("10028获取喷嘴检测结果:" + strResult, 0);
-                                            SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
-                                        }
-                                        else
-                                        {
-                                            ShowLog("10028获取喷嘴检测结果失败：结果为空!", 1);
-                                            //strMessage = "获取结果失败：结果为空!";
-                                        }
-                                    }
-                                }
-
-                            }
-                            break;
-                        case 10018:
-                            //喷嘴检测结果163N
-                            if (workStatusInfo.nWorkStatus == 0)
-                            {
-                                int iIndex = hsl.ReadUShort("D3019", 1)[0];
-                                WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
-                                if (wp == null)
-                                {
-                                    ShowLog("喷嘴清洗后163N未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
-                                    return;
-                                }
-                                int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
-                                List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
-                                if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
-                                {
-                                    if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
-                                    {
-
-                                        Task.Run(() => {
-                                            Invoke(new Action(() => {
-                                                ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["163N.图像源1"];
-                                                ImageBaseData pic = tool.ModuResult.ImageData;
-                                                Image img = ImageBaseDataToBitmap(pic);
-                                                wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
-                                                SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
-                                                
-                                            }));
-                                        });
-
-                                        //获取流程结果
-                                        string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
-                                        if (strResult != null)
-                                        {
-                                            //实时显示结果
-                                            Invoke(new Action(() => {
-                                                MouseResult.Text = strResult == "OK" ? "OK" : "NG";
-                                                MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
-                                            }));
-                                            ShowLog("10018获取喷嘴检测结果:" + strResult, 0);
-                                            SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
-                                        }
-                                        else
-                                        {
-                                            ShowLog("10018获取喷嘴检测结果失败：结果为空!", 1);
-                                            //strMessage = "获取结果失败：结果为空!";
-                                        }
-                                    }
-                                }
-
-                            }
-                            break;
-                        case 10021:
-                            //喷嘴检测结果235CSN
-                            if (workStatusInfo.nWorkStatus == 0)
-                            {
-                                int iIndex = hsl.ReadUShort("D3019", 1)[0];
-                                WorkPiece wp = SoftConfig.lstWorkPiece.Where(x => x.Index == iIndex).FirstOrDefault();
-                                if (wp == null)
-                                {
-                                    ShowLog("喷嘴清洗后235CSN未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
-                                    return;
-                                }
-                                int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
-                                List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
-                                if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
-                                {
-                                    if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
-                                    {
-
-                                        Task.Run(() => {
-                                            Invoke(new Action(() => {
-                                                ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["235CSN.图像源1"];
-                                                ImageBaseData pic = tool.ModuResult.ImageData;
-                                                Image img = ImageBaseDataToBitmap(pic);
-                                                wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
-                                                SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
-                                                
-                                            }));
-                                        });
-
-                                        //获取流程结果
-                                        string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
-                                        if (strResult != null)
-                                        {
-                                            //实时显示结果
-                                            Invoke(new Action(() => {
-                                                MouseResult.Text = strResult == "OK" ? "OK" : "NG";
-                                                MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
-                                            }));
-                                            ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果:" + strResult, 0);
-                                            SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
-                                        }
-                                        else
-                                        {
-                                            ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果失败：结果为空!", 1);
-                                            //strMessage = "获取结果失败：结果为空!";
-                                        }
-                                    }
-                                }
-
-                            }
-                            break;
-                        case 10022:
-                            //喷嘴检测结果230CS
-                            if (workStatusInfo.nWorkStatus == 0)
-                            {
-                                int iIndex = hsl.ReadUShort("D3019", 1)[0];
-                                WorkPiece wp = SoftConfig.lstWorkPiece.Where(x => x.Index == iIndex).FirstOrDefault();
-                                if (wp == null)
-                                {
-                                    ShowLog("喷嘴清洗后230CS未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
-                                    return;
-                                }
-                                int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
-                                List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
-                                if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
-                                {
-                                    if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
-                                    {
-
-                                        Task.Run(() => {
-                                            Invoke(new Action(() => {
-                                                ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["230CS.图像源1"];
-                                                ImageBaseData pic = tool.ModuResult.ImageData;
-                                                Image img = ImageBaseDataToBitmap(pic);
-                                                wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
-                                                SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
-                                                
-                                            }));
-                                        });
-
-                                        //获取流程结果
-                                        string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
-                                        if (strResult != null)
-                                        {
-                                            //实时显示结果
-                                            Invoke(new Action(() => {
-                                                MouseResult.Text = strResult == "OK" ? "OK" : "NG";
-                                                MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
-                                            }));
-                                            ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果:" + strResult, 0);
-                                            SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
-                                        }
-                                        else
-                                        {
-                                            ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果失败：结果为空!", 1);
-                                            //strMessage = "获取结果失败：结果为空!";
-                                        }
-                                    }
-                                }
-
-                            }
-                            break;
-                        case 10029:
-                            //喷嘴检测结果161
-                            if (workStatusInfo.nWorkStatus == 0)
-                            {
-                                int iIndex = hsl.ReadUShort("D3019", 1)[0];
-                                WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
-                                if (wp == null)
-                                {
-                                    ShowLog("喷嘴清洗后161未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
-                                    return;
-                                }
-                                int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
-                                List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
-                                if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
-                                {
-                                    if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
-                                    {
-
-                                        Task.Run(() => {
-                                            Invoke(new Action(() => {
-                                                ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["161.图像源1"];
-                                                ImageBaseData pic = tool.ModuResult.ImageData;
-                                                Image img = ImageBaseDataToBitmap(pic);
-                                                wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
-                                                SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
-                                                
-                                            }));
-                                        });
-
-                                        //获取流程结果
-                                        string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
-                                        if (strResult != null)
-                                        {
-                                            //实时显示结果
-                                            Invoke(new Action(() => {
-                                                MouseResult.Text = strResult == "OK" ? "OK" : "NG";
-                                                MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
-                                            }));
-                                            ShowLog("10029获取喷嘴检测结果:" + strResult, 0);
-                                            SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
-                                        }
-                                        else
-                                        {
-                                            ShowLog("10029获取喷嘴检测结果失败：结果为空!", 1);
-                                            //strMessage = "获取结果失败：结果为空!";
-                                        }
-                                    }
-                                }
-
-                            }
-                            break;
-                        case 10027:
-                            //喷嘴检测结果240CS
-                            if (workStatusInfo.nWorkStatus == 0)
-                            {
-                                int iIndex = hsl.ReadUShort("D3019", 1)[0];
-                                WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
-                                if (wp == null)
-                                {
-                                    ShowLog("喷嘴清洗后240CS未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
-                                    return;
-                                }
-                                int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
-                                List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
-                                if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
-                                {
-                                    if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
-                                    {
-
-                                        Task.Run(() => {
-                                            Invoke(new Action(() => {
-                                                ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["240CS.图像源1"];
-                                                ImageBaseData pic = tool.ModuResult.ImageData;
-                                                Image img = ImageBaseDataToBitmap(pic);
-                                                wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
-                                                SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
-                                                
-                                            }));
-                                        });
-
-                                        //获取流程结果
-                                        string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
-                                        if (strResult != null)
-                                        {
-                                            //实时显示结果
-                                            Invoke(new Action(() => {
-                                                MouseResult.Text = strResult == "OK" ? "OK" : "NG";
-                                                MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
-                                            }));
-                                            ShowLog("10027获取喷嘴检测结果:" + strResult, 0);
-                                            SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
-                                        }
-                                        else
-                                        {
-                                            ShowLog("10027获取喷嘴检测结果失败：结果为空!", 1);
-                                            //strMessage = "获取结果失败：结果为空!";
-                                        }
-                                    }
-                                }
-
-                            }
-                            break;
-                        case 10026:
-                            //喷嘴检测结果240CSN
-                            if (workStatusInfo.nWorkStatus == 0)
-                            {
-                                int iIndex = hsl.ReadUShort("D3019", 1)[0];
-                                WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
-                                if (wp == null)
-                                {
-                                    ShowLog("喷嘴清洗后240CSN未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
-                                    return;
-                                }
-                                int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
-                                List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
-                                if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
-                                {
-                                    if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
-                                    {
-
-                                        Task.Run(() => {
-                                            Invoke(new Action(() => {
-                                                ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["240CSN.图像源1"];
-                                                ImageBaseData pic = tool.ModuResult.ImageData;
-                                                Image img = ImageBaseDataToBitmap(pic);
-                                                wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
-                                                SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
-                                                
-                                            }));
-                                        });
-
-                                        //获取流程结果
-                                        string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
-                                        if (strResult != null)
-                                        {
-                                            //实时显示结果
-                                            Invoke(new Action(() => {
-                                                MouseResult.Text = strResult == "OK" ? "OK" : "NG";
-                                                MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
-                                            }));
-                                            ShowLog("10026获取喷嘴检测结果:" + strResult, 0);
-                                            SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
-                                        }
-                                        else
-                                        {
-                                            ShowLog("10026获取喷嘴检测结果失败：结果为空!", 1);
-                                            //strMessage = "获取结果失败：结果为空!";
-                                        }
-                                    }
-                                }
-
-                            }
-                            break;
-                        case 10000:
-                            //喷嘴检测结果225CS
-                            if (workStatusInfo.nWorkStatus == 0)
-                            {
-                                int iIndex = hsl.ReadUShort("D3019", 1)[0];
-                                WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
-                                if (wp == null)
-                                {
-                                    ShowLog("喷嘴清洗后225CS未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
-                                    return;
-                                }
-                                int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
-                                List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
-                                if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
-                                {
-                                    if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
-                                    {
-
-                                        Task.Run(() => {
-                                            Invoke(new Action(() => {
-                                                ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["225CS.图像源1"];
-                                                ImageBaseData pic = tool.ModuResult.ImageData;
-                                                Image img = ImageBaseDataToBitmap(pic);
-                                                wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
-                                                SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
-                                                
-                                            }));
-                                        });
-
-                                        //获取流程结果
-                                        string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
-                                        if (strResult != null)
-                                        {
-                                            //实时显示结果
-                                            Invoke(new Action(()=> {
-                                                MouseResult.Text = strResult == "OK" ? "OK" : "NG";
-                                                MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
-                                            }));
-                                            ShowLog("10000获取喷嘴检测结果:" + strResult, 0);
-                                            SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
-                                        }
-                                        else
-                                        {
-                                            ShowLog("10000获取喷嘴检测结果失败：结果为空!", 1);
-                                            //strMessage = "获取结果失败：结果为空!";
-                                        }
-                                    }
-                                }
-
-                            }
-                            break;
-                        case 10010:
-                            //喷嘴检测结果226CSN
-                            if (workStatusInfo.nWorkStatus == 0)
-                            {
-                                int iIndex = hsl.ReadUShort("D3019", 1)[0];
-                                WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
-                                if (wp == null)
-                                {
-                                    ShowLog("喷嘴清洗后226CSN未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
-                                    return;
-                                }
-                                int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
-                                List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
-                                if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
-                                {
-                                    if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
-                                    {
-
-                                        Task.Run(() => {
-                                            Invoke(new Action(() => {
-                                                ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["226CSN.图像源1"];
-                                                ImageBaseData pic = tool.ModuResult.ImageData;
-                                                Image img = ImageBaseDataToBitmap(pic);
-                                                wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
-                                                SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
-                                                
-                                            }));
-                                        });
-
-                                        //获取流程结果
-                                        string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
-                                        if (strResult != null)
-                                        {
-                                            //实时显示结果
-                                            Invoke(new Action(() => {
-                                                MouseResult.Text = strResult == "OK" ? "OK" : "NG";
-                                                MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
-                                            }));
-                                            ShowLog("10010获取喷嘴检测结果:" + strResult, 0);
-                                            SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
-                                        }
-                                        else
-                                        {
-                                            ShowLog("10010获取喷嘴检测结果失败：结果为空!", 1);
-                                            //strMessage = "获取结果失败：结果为空!";
-                                        }
-                                    }
-                                }
-
-                            }
-                            break;
-                        case 10012:
-                            //喷嘴检测结果110
-                            if (workStatusInfo.nWorkStatus == 0)
-                            {
-                                int iIndex = hsl.ReadUShort("D3019", 1)[0];
-                                WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
-                                if (wp == null)
-                                {
-                                    ShowLog("喷嘴清洗后110未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
-                                    return;
-                                }
-                                int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
-                                List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
-                                if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
-                                {
-                                    if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
-                                    {
-
-                                        Task.Run(() => {
-                                            Invoke(new Action(() => {
-                                                ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["110.图像源1"];
-                                                ImageBaseData pic = tool.ModuResult.ImageData;
-                                                Image img = ImageBaseDataToBitmap(pic);
-                                                wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
-                                                SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
-                                            }));
-                                        });
-
-                                        //获取流程结果
-                                        string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
-                                        if (strResult != null)
-                                        {
-                                            //实时显示结果
-                                            Invoke(new Action(() => {
-                                                MouseResult.Text = strResult == "OK" ? "OK" : "NG";
-                                                MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
-                                            }));
-                                            ShowLog("10012获取喷嘴检测结果:" + strResult, 0);
-                                            SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
-                                        }
-                                        else
-                                        {
-                                            ShowLog("10012获取喷嘴检测结果失败：结果为空!", 1);
-                                            //strMessage = "获取结果失败：结果为空!";
-                                        }
-                                    }
-                                }
-
-                            }
-                            break;
-                        case 10013:
-                            //喷嘴检测结果230CSN
-                            if (workStatusInfo.nWorkStatus == 0)
-                            {
-                                int iIndex = hsl.ReadUShort("D3019", 1)[0];
-                                WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
-                                if (wp == null)
-                                {
-                                    ShowLog("喷嘴清洗后230CSN未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
-                                    return;
-                                }
-                                int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
-                                List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
-                                if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
-                                {
-                                    if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
-                                    {
-
-                                        Task.Run(() => {
-                                            Invoke(new Action(() => {
-                                                ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["230CSN.图像源1"];
-                                                ImageBaseData pic = tool.ModuResult.ImageData;
-                                                Image img = ImageBaseDataToBitmap(pic);
-                                                wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
-                                                SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
-                                            }));
-                                        });
-
-                                        //获取流程结果
-                                        string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
-                                        if (strResult != null)
-                                        {
-                                            //实时显示结果
-                                            Invoke(new Action(() => {
-                                                MouseResult.Text = strResult == "OK" ? "OK" : "NG";
-                                                MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
-                                            }));
-                                            ShowLog("10013获取喷嘴检测结果:" + strResult, 0);
-                                            SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
-                                        }
-                                        else
-                                        {
-                                            ShowLog("10013获取喷嘴检测结果失败：结果为空!", 1);
-                                            //strMessage = "获取结果失败：结果为空!";
-                                        }
-                                    }
-                                }
-
-                            }
-                            break;
-                        case 10014:
-                            //喷嘴检测结果256CSN
-                            if (workStatusInfo.nWorkStatus == 0)
-                            {
-                                int iIndex = hsl.ReadUShort("D3019", 1)[0];
-                                WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
-                                if (wp == null)
-                                {
-                                    ShowLog("喷嘴清洗后256CSN未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
-                                    return;
-                                }
-                                int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
-                                List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
-                                if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
-                                {
-                                    if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
-                                    {
-
-                                        Task.Run(() => {
-                                            Invoke(new Action(() => {
-                                                ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["256CSN.图像源1"];
-                                                ImageBaseData pic = tool.ModuResult.ImageData;
-                                                Image img = ImageBaseDataToBitmap(pic);
-                                                wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
-                                                SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
-                                            }));
-                                        });
-
-                                        //获取流程结果
-                                        string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
-                                        if (strResult != null)
-                                        {
-                                            //实时显示结果
-                                            Invoke(new Action(() => {
-                                                MouseResult.Text = strResult == "OK" ? "OK" : "NG";
-                                                MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
-                                            }));
-                                            ShowLog("10014获取喷嘴检测结果:" + strResult, 0);
-                                            SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
-                                        }
-                                        else
-                                        {
-                                            ShowLog("10014获取喷嘴检测结果失败：结果为空!", 1);
-                                            //strMessage = "获取结果失败：结果为空!";
-                                        }
-                                    }
-                                }
-
-                            }
-                            break;
-                        case 10015:
-                            //喷嘴检测结果115AS
-                            if (workStatusInfo.nWorkStatus == 0)
-                            {
-                                int iIndex = hsl.ReadUShort("D3019", 1)[0];
-                                WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
-                                if (wp == null)
-                                {
-                                    ShowLog("喷嘴清洗后115AS未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
-                                    return;
-                                }
-                                int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
-                                List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
-                                if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
-                                {
-                                    if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
-                                    {
-
-                                        Task.Run(() => {
-                                            Invoke(new Action(() => {
-                                                ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["115AS.图像源1"];
-                                                ImageBaseData pic = tool.ModuResult.ImageData;
-                                                Image img = ImageBaseDataToBitmap(pic);
-                                                wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
-                                                SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
-                                            }));
-                                        });
-
-                                        //获取流程结果
-                                        string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
-                                        if (strResult != null)
-                                        {
-                                            //实时显示结果
-                                            Invoke(new Action(() => {
-                                                MouseResult.Text = strResult == "OK" ? "OK" : "NG";
-                                                MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
-                                            }));
-                                            ShowLog("10015获取喷嘴检测结果:" + strResult, 0);
-                                            SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
-                                        }
-                                        else
-                                        {
-                                            ShowLog("10015获取喷嘴检测结果失败：结果为空!", 1);
-                                            //strMessage = "获取结果失败：结果为空!";
-                                        }
-                                    }
-                                }
-
-                            }
-                            break;
-                        case 10009:
-                            //喷嘴检测结果235CS
-                            if (workStatusInfo.nWorkStatus == 0)
-                            {
-                                int iIndex = hsl.ReadUShort("D3019", 1)[0];
-                                WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
-                                if (wp == null)
-                                {
-                                    ShowLog("喷嘴清洗后235CS未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
-                                    return;
-                                }
-                                int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
-                                List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
-                                if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
-                                {
-                                    if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
-                                    {
-
-                                        Task.Run(() => {
-                                            Invoke(new Action(() => {
-                                                ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["235CS.图像源1"];
-                                                ImageBaseData pic = tool.ModuResult.ImageData;
-                                                Image img = ImageBaseDataToBitmap(pic);
-                                                wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
-                                                SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
-                                            }));
-                                        });
-
-                                        //获取流程结果
-                                        string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
-                                        if (strResult != null)
-                                        {
-                                            //实时显示结果
-                                            Invoke(new Action(() => {
-                                                MouseResult.Text = strResult == "OK" ? "OK" : "NG";
-                                                MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
-                                            }));
-                                            ShowLog("10009获取喷嘴检测结果:" + strResult, 0);
-                                            SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
-                                        }
-                                        else
-                                        {
-                                            ShowLog("10009获取喷嘴检测结果失败：结果为空!", 1);
-                                            //strMessage = "获取结果失败：结果为空!";
-                                        }
-                                    }
-                                }
-
-                            }
-                            break;
-                        case 10011:
-                            //喷嘴检测默认结果OCR
-                            if (workStatusInfo.nWorkStatus == 0)
-                            {
-                                int iIndex = hsl.ReadUShort("D3019", 1)[0];
-                                WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
-                                if (wp == null)
-                                {
-                                    ShowLog("喷嘴清洗后OCR未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
-                                    return;
-                                }
-                                int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
-                                List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
-                                if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
-                                {
-                                    if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
-                                    {
-
-                                        Task.Run(() => {
-                                            Invoke(new Action(() => {
-                                                ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["OCR.图像源1"];
-                                                ImageBaseData pic = tool.ModuResult.ImageData;
-                                                Image img = ImageBaseDataToBitmap(pic);
-                                                wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
-                                                SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
-                                            }));
-                                        });
-
-                                        //获取流程结果
-                                        string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
-                                        if (strResult != null)
-                                        {
-                                            //实时显示结果
-                                            Invoke(new Action(() => {
-                                                MouseResult.Text = strResult == "OK" ? "OK" : "NG";
-                                                MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
-                                            }));
-                                            ShowLog("10011获取喷嘴检测结果:" + strResult, 0);
-                                            SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
-                                        }
-                                        else
-                                        {
-                                            ShowLog("10011获取喷嘴检测结果失败：结果为空!", 1);
-                                            //strMessage = "获取结果失败：结果为空!";
-                                        }
-                                    }
-                                }
-
-                            }
-                            break;
-                        case 10032:
-                            //喷嘴检测结果185N
-                            if (workStatusInfo.nWorkStatus == 0)
-                            {
-                                int iIndex = hsl.ReadUShort("D3019", 1)[0];
-                                WorkPiece wp = SoftConfig.lstWorkPiece.Where(x => x.Index == iIndex).FirstOrDefault();
-                                if (wp == null)
-                                {
-                                    ShowLog("喷嘴清洗后185N未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
-                                    return;
-                                }
-                                int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
-                                List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
-                                if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
-                                {
-                                    if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
-                                    {
-
-                                        Task.Run(() => {
-                                            Invoke(new Action(() => {
-                                                ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["185N.图像源1"];
-                                                ImageBaseData pic = tool.ModuResult.ImageData;
-                                                Image img = ImageBaseDataToBitmap(pic);
-                                                wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
-                                                SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
-                                            }));
-                                        });
-
-                                        //获取流程结果
-                                        string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
-                                        if (strResult != null)
-                                        {
-                                            //实时显示结果
-                                            Invoke(new Action(() => {
-                                                MouseResult.Text = strResult == "OK" ? "OK" : "NG";
-                                                MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
-                                            }));
-                                            ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果:" + strResult, 0);
-                                            SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
-                                        }
-                                        else
-                                        {
-                                            ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果失败：结果为空!", 1);
-                                            //strMessage = "获取结果失败：结果为空!";
-                                        }
-                                    }
-                                }
-
-                            }
-                            break;
-                        case 10031:
-                            //喷嘴检测结果140N
-                            if (workStatusInfo.nWorkStatus == 0)
-                            {
-                                int iIndex = hsl.ReadUShort("D3019", 1)[0];
-                                WorkPiece wp = SoftConfig.lstWorkPiece.Where(x => x.Index == iIndex).FirstOrDefault();
-                                if (wp == null)
-                                {
-                                    ShowLog("喷嘴清洗后140N未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
-                                    return;
-                                }
-                                int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
-                                List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
-                                if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
-                                {
-                                    if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
-                                    {
-
-                                        Task.Run(() => {
-                                            Invoke(new Action(() => {
-                                                ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["140N.图像源1"];
-                                                ImageBaseData pic = tool.ModuResult.ImageData;
-                                                Image img = ImageBaseDataToBitmap(pic);
-                                                wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
-                                                SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
-                                            }));
-                                        });
-
-                                        //获取流程结果
-                                        string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
-                                        if (strResult != null)
-                                        {
-                                            //实时显示结果
-                                            Invoke(new Action(() => {
-                                                MouseResult.Text = strResult == "OK" ? "OK" : "NG";
-                                                MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
-                                            }));
-                                            ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果:" + strResult, 0);
-                                            SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
-                                        }
-                                        else
-                                        {
-                                            ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果失败：结果为空!", 1);
-                                            //strMessage = "获取结果失败：结果为空!";
-                                        }
-                                    }
-                                }
-
-                            }
-                            break;
-                        case 10030:
-                            //喷嘴检测结果161SN
-                            if (workStatusInfo.nWorkStatus == 0)
-                            {
-                                int iIndex = hsl.ReadUShort("D3019", 1)[0];
-                                WorkPiece wp = SoftConfig.lstWorkPiece.Where(x => x.Index == iIndex).FirstOrDefault();
-                                if (wp == null)
-                                {
-                                    ShowLog("喷嘴清洗后161SN未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
-                                    return;
-                                }
-                                int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
-                                List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
-                                if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
-                                {
-                                    if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
-                                    {
-
-                                        Task.Run(() => {
-                                            Invoke(new Action(() => {
-                                                ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["161SN.图像源1"];
-                                                ImageBaseData pic = tool.ModuResult.ImageData;
-                                                Image img = ImageBaseDataToBitmap(pic);
-                                                wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
-                                                SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
-                                            }));
-                                        });
-
-                                        //获取流程结果
-                                        string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
-                                        if (strResult != null)
-                                        {
-                                            //实时显示结果
-                                            Invoke(new Action(() => {
-                                                MouseResult.Text = strResult == "OK" ? "OK" : "NG";
-                                                MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
-                                            }));
-                                            ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果:" + strResult, 0);
-                                            SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
-                                        }
-                                        else
-                                        {
-                                            ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果失败：结果为空!", 1);
-                                            //strMessage = "获取结果失败：结果为空!";
-                                        }
-                                    }
-                                }
-
-                            }
-                            break;
-                        case 10016:
-                            //喷嘴检测结果225CSN
-                            if (workStatusInfo.nWorkStatus == 0)
-                            {
-                                int iIndex = hsl.ReadUShort("D3019", 1)[0];
-                                WorkPiece wp = SoftConfig.lstWorkPiece.Where(x => x.Index == iIndex).FirstOrDefault();
-                                if (wp == null)
-                                {
-                                    ShowLog("喷嘴清洗后225CSN未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
-                                    return;
-                                }
-                                int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
-                                List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
-                                if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
-                                {
-                                    if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
-                                    {
-
-                                        Task.Run(() => {
-                                            Invoke(new Action(() => {
-                                                ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["225CSN.图像源1"];
-                                                ImageBaseData pic = tool.ModuResult.ImageData;
-                                                Image img = ImageBaseDataToBitmap(pic);
-                                                wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
-                                                SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
-                                                
-                                            }));
-                                        });
-
-                                        //获取流程结果
-                                        string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
-                                        if (strResult != null)
-                                        {
-                                            //实时显示结果
-                                            Invoke(new Action(() => {
-                                                MouseResult.Text = strResult == "OK" ? "OK" : "NG";
-                                                MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
-                                            }));
-                                            ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果:" + strResult, 0);
-                                            SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
-                                        }
-                                        else
-                                        {
-                                            ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果失败：结果为空!", 1);
-                                            //strMessage = "获取结果失败：结果为空!";
-                                        }
-                                    }
-                                }
-
-                            }
-                            break;
-                        case 10034:
-                            //喷嘴检测结果230C
-                            if (workStatusInfo.nWorkStatus == 0)
-                            {
-                                int iIndex = hsl.ReadUShort("D3019", 1)[0];
-                                WorkPiece wp = SoftConfig.lstWorkPiece.Where(x => x.Index == iIndex).FirstOrDefault();
-                                if (wp == null)
-                                {
-                                    ShowLog("喷嘴清洗后230C未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
-                                    return;
-                                }
-                                int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
-                                List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
-                                if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
-                                {
-                                    if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
-                                    {
-
-                                        Task.Run(() => {
-                                            Invoke(new Action(() => {
-                                                ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["230C.图像源1"];
+                                                ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance[vProcess[0].ProcessName+".图像源1"];
                                                 ImageBaseData pic = tool.ModuResult.ImageData;
                                                 Image img = ImageBaseDataToBitmap(pic);
                                                 wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
@@ -2105,119 +1038,11 @@ namespace Panasonic_SmartClean
                                         }
                                     }
                                 }
-
-                            }
-                            break;
-                        case 10035:
-                            //喷嘴检测结果235C
-                            if (workStatusInfo.nWorkStatus == 0)
-                            {
-                                int iIndex = hsl.ReadUShort("D3019", 1)[0];
-                                WorkPiece wp = SoftConfig.lstWorkPiece.Where(x => x.Index == iIndex).FirstOrDefault();
-                                if (wp == null)
-                                {
-                                    ShowLog("喷嘴清洗后235C未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
-                                    return;
-                                }
-                                int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
-                                List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
-                                if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
-                                {
-                                    if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
-                                    {
-
-                                        Task.Run(() => {
-                                            Invoke(new Action(() => {
-                                                ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["235C.图像源1"];
-                                                ImageBaseData pic = tool.ModuResult.ImageData;
-                                                Image img = ImageBaseDataToBitmap(pic);
-                                                wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
-                                                SaveImage(img, SoftConfig.ImagePath + "\\" + wp.MouseAfter);
-
-                                            }));
-                                        });
-
-                                        //获取流程结果
-                                        string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
-                                        if (strResult != null)
-                                        {
-                                            //实时显示结果
-                                            Invoke(new Action(() => {
-                                                MouseResult.Text = strResult == "OK" ? "OK" : "NG";
-                                                MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
-                                            }));
-                                            ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果:" + strResult, 0);
-                                            SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
-                                        }
-                                        else
-                                        {
-                                            ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果失败：结果为空!", 1);
-                                            //strMessage = "获取结果失败：结果为空!";
-                                        }
-                                    }
-                                }
-
-                            }
-                            break;
-                        case 10036:
-                            //喷嘴检测结果240C
-                            if (workStatusInfo.nWorkStatus == 0)
-                            {
-                                int iIndex = hsl.ReadUShort("D3019", 1)[0];
-                                WorkPiece wp = SoftConfig.lstWorkPiece.Where(x => x.Index == iIndex).FirstOrDefault();
-                                if (wp == null)
-                                {
-                                    ShowLog("喷嘴清洗后240C未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
-                                    return;
-                                }
-                                int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
-                                List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
-                                if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
-                                {
-                                    if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
-                                    {
-
-                                        Task.Run(() => {
-                                            Invoke(new Action(() => {
-                                                ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["240C.图像源1"];
-                                                ImageBaseData pic = tool.ModuResult.ImageData;
-                                                Image img = ImageBaseDataToBitmap(pic);
-                                                wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
-                                                SaveImage(img, SoftConfig.ImagePath + "\\" + wp.MouseAfter);
-
-                                            }));
-                                        });
-
-                                        //获取流程结果
-                                        string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
-                                        if (strResult != null)
-                                        {
-                                            //实时显示结果
-                                            Invoke(new Action(() => {
-                                                MouseResult.Text = strResult == "OK" ? "OK" : "NG";
-                                                MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
-                                            }));
-                                            ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果:" + strResult, 0);
-                                            SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
-                                        }
-                                        else
-                                        {
-                                            ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果失败：结果为空!", 1);
-                                            //strMessage = "获取结果失败：结果为空!";
-                                        }
-                                    }
-                                }
-
-                            }
-                            break;
-
-                        case 10006:
-                            //反光板清洗前
-                            if (workStatusInfo.nWorkStatus == 0)
-                            {
+                                break;
+                            case "反光板清洗前":
                                 ShowLog("收到反光板清洗前回调");
-                                int iIndex = hsl.ReadUShort("D3019", 1)[0];
-                                WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
+                                iIndex = hsl.ReadUShort("D3019", 1)[0];
+                                wp = SoftConfig.lstWorkPiece.Where(x => x.Index == iIndex).FirstOrDefault();
                                 if (wp == null)
                                 {
                                     ShowLog("反光板清洗前未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
@@ -2227,29 +1052,24 @@ namespace Panasonic_SmartClean
                                 {
                                     Invoke(new Action(() =>
                                     {
-                                        ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["反光板前.图像源1"];
+                                        ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance[vProcess[0].ProcessName+".图像源1"];
                                         ImageBaseData pic = tool.ModuResult.ImageData;
                                         Image img = ImageBaseDataToBitmap(pic);
                                         wp.BoardBefore = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_2.jpg";
-                                        SaveImage(img,SoftConfig.ImagePath + "\\" + wp.BoardBefore);
+                                        SaveImage(img, SoftConfig.ImagePath + "\\" + wp.BoardBefore);
                                     }));
                                 });
-
-                            }
-                            break;
-                        case 10007:
-                            //反光板检测结果
-                            if (workStatusInfo.nWorkStatus == 0)
-                            {
-                                int iIndex = hsl.ReadUShort("D3019", 1)[0];
-                                WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
+                                break;
+                            case "反光板清洗后":
+                                iIndex = hsl.ReadUShort("D3019", 1)[0];
+                                wp = SoftConfig.lstWorkPiece.Where(x => x.Index == iIndex).FirstOrDefault();
                                 if (wp == null)
                                 {
                                     ShowLog("反光板清洗后未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
                                     return;
                                 }
-                                int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
-                                List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+                                iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
+                                ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
                                 if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
                                 {
                                     if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
@@ -2285,7 +1105,7 @@ namespace Panasonic_SmartClean
                                                 hsl.WriteUshort("D5002", FlowCountStr > iThresholdValue ? (ushort)1 : (ushort)2);
                                                 Invoke(new Action(() =>
                                                 {
-                                                    ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["反光板.图像源1"];
+                                                    ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance[vProcess[0].ProcessName+".图像源1"];
                                                     ImageBaseData pic = tool.ModuResult.ImageData;
                                                     Image img = ImageBaseDataToBitmap(pic);
                                                     wp.BoardAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_4.jpg";
@@ -2300,11 +1120,10 @@ namespace Panasonic_SmartClean
                                             }
                                             catch (Exception ex)
                                             {
-                                                ShowLog("获取流量异常："+ex.Message,1);
+                                                ShowLog("获取流量异常：" + ex.Message, 1);
                                             }
-                                            
-                                        });
 
+                                        });
 
                                         //获取流程结果
                                         string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
@@ -2317,36 +1136,1540 @@ namespace Panasonic_SmartClean
                                             }));
                                             ShowLog("10007获取反光板检测结果:" + strResult, 0);
                                             SoftConfig.lstWorkPiece[iWorkPieceIndex].ReflectBoardResult = strResult;
-                                            
+
                                         }
                                         else
                                         {
                                             ShowLog("10007获取反光板结果失败：结果为空!", 1);
                                             //strMessage = "获取结果失败：结果为空!";
                                         }
-
-                                        //显示
-                                        //CmdNeedShow.Enqueue(iIndex);
                                     }
                                 }
-
-                            }
-                            break;
+                                break;
+                            default:
+                                ShowLog("未知视觉类型请确认",1);
+                                break;
+                        }
                     }
-                    //回调后刷新示意图
-                    CmdNeedRefresh.Enqueue("refresh");
                 }
-                
-                
+
+
             }
             catch (VmException ex)
             {
-                ShowLog("获取结果失败，错误码：0x" + Convert.ToString(ex.errorCode, 16),1);
+                ShowLog("获取结果失败，错误码：0x" + Convert.ToString(ex.errorCode, 16), 1);
             }
             catch (Exception ex)
             {
-                ShowLog("获取结果失败：" + Convert.ToString(ex.Message),1);
+                ShowLog("获取结果失败：" + Convert.ToString(ex.Message), 1);
             }
+
+            #region 注释不用
+            //try
+            //{
+            //    if (workStatusInfo.nWorkStatus == 1)
+            //    {
+            //        if (workStatusInfo.nProcessID==10006|| workStatusInfo.nProcessID == 10007)
+            //        {
+            //            Task.Run(()=> {
+            //                Thread.Sleep(1000);
+            //                Invoke(new Action(() => {
+            //                    VmProcedure vp = GetProcessByID(workStatusInfo.nProcessID);
+            //                    vmRenderControl1.ModuleSource = vp;
+            //                }));
+            //            });
+            //        }
+            //        else
+            //        {
+            //            Invoke(new Action(() => {
+            //                VmProcedure vp = GetProcessByID(workStatusInfo.nProcessID);
+            //                vmRenderControl1.ModuleSource = vp;
+            //            }));
+            //        }
+            //    }
+            //    else if(workStatusInfo.nWorkStatus == 0)
+            //    {
+            //        switch (workStatusInfo.nProcessID)
+            //        {
+            //            case 10003:
+            //                //小型工位拍照
+            //                if (workStatusInfo.nWorkStatus == 0)//为了折叠
+            //                {
+            //                    CurrentType = EWorkPieceType.small;
+            //                    List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+            //                    if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+            //                    {
+            //                        if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+            //                        {
+            //                            //获取流程结果
+            //                            string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+            //                            if (strResult != null)
+            //                            {
+            //                                ShowLog("10003小型工位拍照获取结果:" + strResult, 0);
+            //                                //解析输出
+            //                                CmdNeedAdd.Enqueue(strResult);
+            //                                Invoke(new Action(()=> {
+            //                                    btnType.Text = "小型";
+            //                                }));
+            //                            }
+            //                            else
+            //                            {
+            //                                ShowLog("10003小型工位拍照获取结果失败：结果为空!", 1);
+            //                            }
+            //                        }
+            //                    }
+            //                    else
+            //                    {
+            //                        //strMessage = "获取结果失败：流程结果个数为0!";
+            //                    }
+            //                }
+            //                break;
+            //            case 10004:
+            //                //大型工位拍照
+            //                if (workStatusInfo.nWorkStatus == 0)//流程空闲且为流程
+            //                {
+            //                    CurrentType = EWorkPieceType.big;
+            //                    List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+            //                    if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+            //                    {
+            //                        if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+            //                        {
+            //                            //获取流程结果
+            //                            string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+            //                            if (strResult != null)
+            //                            {
+            //                                ShowLog("10004大型工位拍照获取结果:" + strResult, 0);
+            //                                //解析输出
+            //                                CmdNeedAdd.Enqueue(strResult);
+            //                                Invoke(new Action(() => {
+            //                                    btnType.Text = "大型";
+            //                                }));
+            //                            }
+            //                            else
+            //                            {
+            //                                ShowLog("10004大型工位拍照获取结果失败：结果为空!", 1);
+            //                                //strMessage = "获取结果失败：结果为空!";
+            //                            }
+            //                        }
+            //                    }
+            //                    else
+            //                    {
+            //                        //strMessage = "获取结果失败：流程结果个数为0!";
+            //                    }
+            //                }
+            //                break;
+            //            case 10005:
+            //                //超大型工位拍照
+            //                if (workStatusInfo.nWorkStatus == 0)//流程空闲且为流程
+            //                {
+            //                    CurrentType = EWorkPieceType.superbig;
+            //                    List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+            //                    if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+            //                    {
+            //                        if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+            //                        {
+            //                            //获取流程结果
+            //                            string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+            //                            if (strResult != null)
+            //                            {
+            //                                ShowLog("10005超大型工位拍照获取结果:" + strResult, 0);
+            //                                //解析输出
+            //                                CmdNeedAdd.Enqueue(strResult);
+            //                                Invoke(new Action(() => {
+            //                                    btnType.Text = "超大型";
+            //                                }));
+            //                            }
+            //                            else
+            //                            {
+            //                                ShowLog("10005超大型工位拍照获取结果失败：结果为空!", 1);
+            //                                //strMessage = "获取结果失败：结果为空!";
+            //                            }
+            //                        }
+            //                    }
+            //                    else
+            //                    {
+            //                        //strMessage = "获取结果失败：流程结果个数为0!";
+            //                    }
+            //                }
+            //                break;
+
+            //            case 10008:
+            //                //喷嘴清洗前
+            //                if (workStatusInfo.nWorkStatus == 0)
+            //                {
+            //                    ShowLog("收到喷嘴清洗前回调");
+            //                    int iIndex = hsl.ReadUShort("D3019", 1)[0];
+            //                    WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
+            //                    if (wp == null)
+            //                    {
+            //                        ShowLog("喷嘴清洗前未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+            //                        return;
+            //                    }
+            //                    Task.Run(() => {
+            //                        Invoke(new Action(() => {
+            //                            ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["吸嘴前.图像源1"];
+            //                            ImageBaseData pic = tool.ModuResult.ImageData;
+            //                            Image img = ImageBaseDataToBitmap(pic);
+            //                            wp.MouseBefore = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_1.jpg";
+            //                            SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseBefore);
+            //                        }));
+            //                    });
+            //                }
+            //                break;
+
+            //            case 10020:
+            //                //喷嘴检测结果235CN
+            //                if (workStatusInfo.nWorkStatus == 0)
+            //                {
+            //                    int iIndex = hsl.ReadUShort("D3019", 1)[0];
+            //                    WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
+            //                    if (wp == null)
+            //                    {
+            //                        ShowLog("喷嘴清洗后235CN未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+            //                        return;
+            //                    }
+            //                    int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
+            //                    List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+            //                    if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+            //                    {
+            //                        if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+            //                        {
+
+            //                            Task.Run(() => {
+            //                                Invoke(new Action(() => {
+            //                                    ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["235CN.图像源1"];
+            //                                    ImageBaseData pic = tool.ModuResult.ImageData;
+            //                                    Image img = ImageBaseDataToBitmap(pic);
+            //                                    wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
+            //                                    SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
+
+            //                                }));
+            //                            });
+
+            //                            //获取流程结果
+            //                            string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+            //                            if (strResult != null)
+            //                            {
+            //                                //实时显示结果
+            //                                Invoke(new Action(() => {
+            //                                    MouseResult.Text = strResult == "OK" ? "OK" : "NG";
+            //                                    MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
+            //                                }));
+            //                                ShowLog("10020获取喷嘴检测结果:" + strResult, 0);
+            //                                SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
+            //                            }
+            //                            else
+            //                            {
+            //                                ShowLog("10020获取喷嘴检测结果失败：结果为空!", 1);
+            //                                //strMessage = "获取结果失败：结果为空!";
+            //                            }
+            //                        }
+            //                    }
+
+            //                }
+            //                break;
+            //            case 10019:
+            //                //喷嘴检测结果230CN
+            //                if (workStatusInfo.nWorkStatus == 0)
+            //                {
+            //                    int iIndex = hsl.ReadUShort("D3019", 1)[0];
+            //                    WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
+            //                    if (wp == null)
+            //                    {
+            //                        ShowLog("喷嘴清洗后230CN未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+            //                        return;
+            //                    }
+            //                    int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
+            //                    List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+            //                    if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+            //                    {
+            //                        if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+            //                        {
+
+            //                            Task.Run(() => {
+            //                                Invoke(new Action(() => {
+            //                                    ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["230CN.图像源1"];
+            //                                    ImageBaseData pic = tool.ModuResult.ImageData;
+            //                                    Image img = ImageBaseDataToBitmap(pic);
+            //                                    wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
+            //                                    SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
+
+            //                                }));
+            //                            });
+
+            //                            //获取流程结果
+            //                            string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+            //                            if (strResult != null)
+            //                            {
+            //                                //实时显示结果
+            //                                Invoke(new Action(() => {
+            //                                    MouseResult.Text = strResult == "OK" ? "OK" : "NG";
+            //                                    MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
+            //                                }));
+            //                                ShowLog("10019获取喷嘴检测结果:" + strResult, 0);
+            //                                SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
+            //                            }
+            //                            else
+            //                            {
+            //                                ShowLog("10019获取喷嘴检测结果失败：结果为空!", 1);
+            //                                //strMessage = "获取结果失败：结果为空!";
+            //                            }
+            //                        }
+            //                    }
+
+            //                }
+            //                break;
+            //            case 10028:
+            //                //喷嘴检测结果240CN
+            //                if (workStatusInfo.nWorkStatus == 0)
+            //                {
+            //                    int iIndex = hsl.ReadUShort("D3019", 1)[0];
+            //                    WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
+            //                    if (wp == null)
+            //                    {
+            //                        ShowLog("喷嘴清洗后240CN未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+            //                        return;
+            //                    }
+            //                    int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
+            //                    List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+            //                    if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+            //                    {
+            //                        if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+            //                        {
+
+            //                            Task.Run(() => {
+            //                                Invoke(new Action(() => {
+            //                                    ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["240CN.图像源1"];
+            //                                    ImageBaseData pic = tool.ModuResult.ImageData;
+            //                                    Image img = ImageBaseDataToBitmap(pic);
+            //                                    wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
+            //                                    SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
+
+            //                                }));
+            //                            });
+
+            //                            //获取流程结果
+            //                            string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+            //                            if (strResult != null)
+            //                            {
+            //                                //实时显示结果
+            //                                Invoke(new Action(() => {
+            //                                    MouseResult.Text = strResult == "OK" ? "OK" : "NG";
+            //                                    MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
+            //                                }));
+            //                                ShowLog("10028获取喷嘴检测结果:" + strResult, 0);
+            //                                SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
+            //                            }
+            //                            else
+            //                            {
+            //                                ShowLog("10028获取喷嘴检测结果失败：结果为空!", 1);
+            //                                //strMessage = "获取结果失败：结果为空!";
+            //                            }
+            //                        }
+            //                    }
+
+            //                }
+            //                break;
+            //            case 10018:
+            //                //喷嘴检测结果163N
+            //                if (workStatusInfo.nWorkStatus == 0)
+            //                {
+            //                    int iIndex = hsl.ReadUShort("D3019", 1)[0];
+            //                    WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
+            //                    if (wp == null)
+            //                    {
+            //                        ShowLog("喷嘴清洗后163N未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+            //                        return;
+            //                    }
+            //                    int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
+            //                    List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+            //                    if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+            //                    {
+            //                        if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+            //                        {
+
+            //                            Task.Run(() => {
+            //                                Invoke(new Action(() => {
+            //                                    ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["163N.图像源1"];
+            //                                    ImageBaseData pic = tool.ModuResult.ImageData;
+            //                                    Image img = ImageBaseDataToBitmap(pic);
+            //                                    wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
+            //                                    SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
+
+            //                                }));
+            //                            });
+
+            //                            //获取流程结果
+            //                            string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+            //                            if (strResult != null)
+            //                            {
+            //                                //实时显示结果
+            //                                Invoke(new Action(() => {
+            //                                    MouseResult.Text = strResult == "OK" ? "OK" : "NG";
+            //                                    MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
+            //                                }));
+            //                                ShowLog("10018获取喷嘴检测结果:" + strResult, 0);
+            //                                SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
+            //                            }
+            //                            else
+            //                            {
+            //                                ShowLog("10018获取喷嘴检测结果失败：结果为空!", 1);
+            //                                //strMessage = "获取结果失败：结果为空!";
+            //                            }
+            //                        }
+            //                    }
+
+            //                }
+            //                break;
+            //            case 10021:
+            //                //喷嘴检测结果235CSN
+            //                if (workStatusInfo.nWorkStatus == 0)
+            //                {
+            //                    int iIndex = hsl.ReadUShort("D3019", 1)[0];
+            //                    WorkPiece wp = SoftConfig.lstWorkPiece.Where(x => x.Index == iIndex).FirstOrDefault();
+            //                    if (wp == null)
+            //                    {
+            //                        ShowLog("喷嘴清洗后235CSN未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+            //                        return;
+            //                    }
+            //                    int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
+            //                    List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+            //                    if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+            //                    {
+            //                        if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+            //                        {
+
+            //                            Task.Run(() => {
+            //                                Invoke(new Action(() => {
+            //                                    ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["235CSN.图像源1"];
+            //                                    ImageBaseData pic = tool.ModuResult.ImageData;
+            //                                    Image img = ImageBaseDataToBitmap(pic);
+            //                                    wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
+            //                                    SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
+
+            //                                }));
+            //                            });
+
+            //                            //获取流程结果
+            //                            string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+            //                            if (strResult != null)
+            //                            {
+            //                                //实时显示结果
+            //                                Invoke(new Action(() => {
+            //                                    MouseResult.Text = strResult == "OK" ? "OK" : "NG";
+            //                                    MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
+            //                                }));
+            //                                ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果:" + strResult, 0);
+            //                                SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
+            //                            }
+            //                            else
+            //                            {
+            //                                ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果失败：结果为空!", 1);
+            //                                //strMessage = "获取结果失败：结果为空!";
+            //                            }
+            //                        }
+            //                    }
+
+            //                }
+            //                break;
+            //            case 10022:
+            //                //喷嘴检测结果230CS
+            //                if (workStatusInfo.nWorkStatus == 0)
+            //                {
+            //                    int iIndex = hsl.ReadUShort("D3019", 1)[0];
+            //                    WorkPiece wp = SoftConfig.lstWorkPiece.Where(x => x.Index == iIndex).FirstOrDefault();
+            //                    if (wp == null)
+            //                    {
+            //                        ShowLog("喷嘴清洗后230CS未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+            //                        return;
+            //                    }
+            //                    int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
+            //                    List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+            //                    if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+            //                    {
+            //                        if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+            //                        {
+
+            //                            Task.Run(() => {
+            //                                Invoke(new Action(() => {
+            //                                    ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["230CS.图像源1"];
+            //                                    ImageBaseData pic = tool.ModuResult.ImageData;
+            //                                    Image img = ImageBaseDataToBitmap(pic);
+            //                                    wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
+            //                                    SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
+
+            //                                }));
+            //                            });
+
+            //                            //获取流程结果
+            //                            string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+            //                            if (strResult != null)
+            //                            {
+            //                                //实时显示结果
+            //                                Invoke(new Action(() => {
+            //                                    MouseResult.Text = strResult == "OK" ? "OK" : "NG";
+            //                                    MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
+            //                                }));
+            //                                ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果:" + strResult, 0);
+            //                                SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
+            //                            }
+            //                            else
+            //                            {
+            //                                ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果失败：结果为空!", 1);
+            //                                //strMessage = "获取结果失败：结果为空!";
+            //                            }
+            //                        }
+            //                    }
+
+            //                }
+            //                break;
+            //            case 10029:
+            //                //喷嘴检测结果161
+            //                if (workStatusInfo.nWorkStatus == 0)
+            //                {
+            //                    int iIndex = hsl.ReadUShort("D3019", 1)[0];
+            //                    WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
+            //                    if (wp == null)
+            //                    {
+            //                        ShowLog("喷嘴清洗后161未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+            //                        return;
+            //                    }
+            //                    int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
+            //                    List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+            //                    if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+            //                    {
+            //                        if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+            //                        {
+
+            //                            Task.Run(() => {
+            //                                Invoke(new Action(() => {
+            //                                    ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["161.图像源1"];
+            //                                    ImageBaseData pic = tool.ModuResult.ImageData;
+            //                                    Image img = ImageBaseDataToBitmap(pic);
+            //                                    wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
+            //                                    SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
+
+            //                                }));
+            //                            });
+
+            //                            //获取流程结果
+            //                            string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+            //                            if (strResult != null)
+            //                            {
+            //                                //实时显示结果
+            //                                Invoke(new Action(() => {
+            //                                    MouseResult.Text = strResult == "OK" ? "OK" : "NG";
+            //                                    MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
+            //                                }));
+            //                                ShowLog("10029获取喷嘴检测结果:" + strResult, 0);
+            //                                SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
+            //                            }
+            //                            else
+            //                            {
+            //                                ShowLog("10029获取喷嘴检测结果失败：结果为空!", 1);
+            //                                //strMessage = "获取结果失败：结果为空!";
+            //                            }
+            //                        }
+            //                    }
+
+            //                }
+            //                break;
+            //            case 10027:
+            //                //喷嘴检测结果240CS
+            //                if (workStatusInfo.nWorkStatus == 0)
+            //                {
+            //                    int iIndex = hsl.ReadUShort("D3019", 1)[0];
+            //                    WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
+            //                    if (wp == null)
+            //                    {
+            //                        ShowLog("喷嘴清洗后240CS未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+            //                        return;
+            //                    }
+            //                    int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
+            //                    List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+            //                    if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+            //                    {
+            //                        if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+            //                        {
+
+            //                            Task.Run(() => {
+            //                                Invoke(new Action(() => {
+            //                                    ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["240CS.图像源1"];
+            //                                    ImageBaseData pic = tool.ModuResult.ImageData;
+            //                                    Image img = ImageBaseDataToBitmap(pic);
+            //                                    wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
+            //                                    SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
+
+            //                                }));
+            //                            });
+
+            //                            //获取流程结果
+            //                            string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+            //                            if (strResult != null)
+            //                            {
+            //                                //实时显示结果
+            //                                Invoke(new Action(() => {
+            //                                    MouseResult.Text = strResult == "OK" ? "OK" : "NG";
+            //                                    MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
+            //                                }));
+            //                                ShowLog("10027获取喷嘴检测结果:" + strResult, 0);
+            //                                SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
+            //                            }
+            //                            else
+            //                            {
+            //                                ShowLog("10027获取喷嘴检测结果失败：结果为空!", 1);
+            //                                //strMessage = "获取结果失败：结果为空!";
+            //                            }
+            //                        }
+            //                    }
+
+            //                }
+            //                break;
+            //            case 10026:
+            //                //喷嘴检测结果240CSN
+            //                if (workStatusInfo.nWorkStatus == 0)
+            //                {
+            //                    int iIndex = hsl.ReadUShort("D3019", 1)[0];
+            //                    WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
+            //                    if (wp == null)
+            //                    {
+            //                        ShowLog("喷嘴清洗后240CSN未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+            //                        return;
+            //                    }
+            //                    int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
+            //                    List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+            //                    if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+            //                    {
+            //                        if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+            //                        {
+
+            //                            Task.Run(() => {
+            //                                Invoke(new Action(() => {
+            //                                    ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["240CSN.图像源1"];
+            //                                    ImageBaseData pic = tool.ModuResult.ImageData;
+            //                                    Image img = ImageBaseDataToBitmap(pic);
+            //                                    wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
+            //                                    SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
+
+            //                                }));
+            //                            });
+
+            //                            //获取流程结果
+            //                            string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+            //                            if (strResult != null)
+            //                            {
+            //                                //实时显示结果
+            //                                Invoke(new Action(() => {
+            //                                    MouseResult.Text = strResult == "OK" ? "OK" : "NG";
+            //                                    MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
+            //                                }));
+            //                                ShowLog("10026获取喷嘴检测结果:" + strResult, 0);
+            //                                SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
+            //                            }
+            //                            else
+            //                            {
+            //                                ShowLog("10026获取喷嘴检测结果失败：结果为空!", 1);
+            //                                //strMessage = "获取结果失败：结果为空!";
+            //                            }
+            //                        }
+            //                    }
+
+            //                }
+            //                break;
+            //            case 10000:
+            //                //喷嘴检测结果225CS
+            //                if (workStatusInfo.nWorkStatus == 0)
+            //                {
+            //                    int iIndex = hsl.ReadUShort("D3019", 1)[0];
+            //                    WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
+            //                    if (wp == null)
+            //                    {
+            //                        ShowLog("喷嘴清洗后225CS未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+            //                        return;
+            //                    }
+            //                    int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
+            //                    List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+            //                    if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+            //                    {
+            //                        if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+            //                        {
+
+            //                            Task.Run(() => {
+            //                                Invoke(new Action(() => {
+            //                                    ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["225CS.图像源1"];
+            //                                    ImageBaseData pic = tool.ModuResult.ImageData;
+            //                                    Image img = ImageBaseDataToBitmap(pic);
+            //                                    wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
+            //                                    SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
+
+            //                                }));
+            //                            });
+
+            //                            //获取流程结果
+            //                            string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+            //                            if (strResult != null)
+            //                            {
+            //                                //实时显示结果
+            //                                Invoke(new Action(()=> {
+            //                                    MouseResult.Text = strResult == "OK" ? "OK" : "NG";
+            //                                    MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
+            //                                }));
+            //                                ShowLog("10000获取喷嘴检测结果:" + strResult, 0);
+            //                                SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
+            //                            }
+            //                            else
+            //                            {
+            //                                ShowLog("10000获取喷嘴检测结果失败：结果为空!", 1);
+            //                                //strMessage = "获取结果失败：结果为空!";
+            //                            }
+            //                        }
+            //                    }
+
+            //                }
+            //                break;
+            //            case 10010:
+            //                //喷嘴检测结果226CSN
+            //                if (workStatusInfo.nWorkStatus == 0)
+            //                {
+            //                    int iIndex = hsl.ReadUShort("D3019", 1)[0];
+            //                    WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
+            //                    if (wp == null)
+            //                    {
+            //                        ShowLog("喷嘴清洗后226CSN未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+            //                        return;
+            //                    }
+            //                    int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
+            //                    List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+            //                    if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+            //                    {
+            //                        if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+            //                        {
+
+            //                            Task.Run(() => {
+            //                                Invoke(new Action(() => {
+            //                                    ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["226CSN.图像源1"];
+            //                                    ImageBaseData pic = tool.ModuResult.ImageData;
+            //                                    Image img = ImageBaseDataToBitmap(pic);
+            //                                    wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
+            //                                    SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
+
+            //                                }));
+            //                            });
+
+            //                            //获取流程结果
+            //                            string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+            //                            if (strResult != null)
+            //                            {
+            //                                //实时显示结果
+            //                                Invoke(new Action(() => {
+            //                                    MouseResult.Text = strResult == "OK" ? "OK" : "NG";
+            //                                    MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
+            //                                }));
+            //                                ShowLog("10010获取喷嘴检测结果:" + strResult, 0);
+            //                                SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
+            //                            }
+            //                            else
+            //                            {
+            //                                ShowLog("10010获取喷嘴检测结果失败：结果为空!", 1);
+            //                                //strMessage = "获取结果失败：结果为空!";
+            //                            }
+            //                        }
+            //                    }
+
+            //                }
+            //                break;
+            //            case 10012:
+            //                //喷嘴检测结果110
+            //                if (workStatusInfo.nWorkStatus == 0)
+            //                {
+            //                    int iIndex = hsl.ReadUShort("D3019", 1)[0];
+            //                    WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
+            //                    if (wp == null)
+            //                    {
+            //                        ShowLog("喷嘴清洗后110未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+            //                        return;
+            //                    }
+            //                    int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
+            //                    List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+            //                    if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+            //                    {
+            //                        if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+            //                        {
+
+            //                            Task.Run(() => {
+            //                                Invoke(new Action(() => {
+            //                                    ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["110.图像源1"];
+            //                                    ImageBaseData pic = tool.ModuResult.ImageData;
+            //                                    Image img = ImageBaseDataToBitmap(pic);
+            //                                    wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
+            //                                    SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
+            //                                }));
+            //                            });
+
+            //                            //获取流程结果
+            //                            string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+            //                            if (strResult != null)
+            //                            {
+            //                                //实时显示结果
+            //                                Invoke(new Action(() => {
+            //                                    MouseResult.Text = strResult == "OK" ? "OK" : "NG";
+            //                                    MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
+            //                                }));
+            //                                ShowLog("10012获取喷嘴检测结果:" + strResult, 0);
+            //                                SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
+            //                            }
+            //                            else
+            //                            {
+            //                                ShowLog("10012获取喷嘴检测结果失败：结果为空!", 1);
+            //                                //strMessage = "获取结果失败：结果为空!";
+            //                            }
+            //                        }
+            //                    }
+
+            //                }
+            //                break;
+            //            case 10013:
+            //                //喷嘴检测结果230CSN
+            //                if (workStatusInfo.nWorkStatus == 0)
+            //                {
+            //                    int iIndex = hsl.ReadUShort("D3019", 1)[0];
+            //                    WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
+            //                    if (wp == null)
+            //                    {
+            //                        ShowLog("喷嘴清洗后230CSN未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+            //                        return;
+            //                    }
+            //                    int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
+            //                    List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+            //                    if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+            //                    {
+            //                        if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+            //                        {
+
+            //                            Task.Run(() => {
+            //                                Invoke(new Action(() => {
+            //                                    ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["230CSN.图像源1"];
+            //                                    ImageBaseData pic = tool.ModuResult.ImageData;
+            //                                    Image img = ImageBaseDataToBitmap(pic);
+            //                                    wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
+            //                                    SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
+            //                                }));
+            //                            });
+
+            //                            //获取流程结果
+            //                            string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+            //                            if (strResult != null)
+            //                            {
+            //                                //实时显示结果
+            //                                Invoke(new Action(() => {
+            //                                    MouseResult.Text = strResult == "OK" ? "OK" : "NG";
+            //                                    MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
+            //                                }));
+            //                                ShowLog("10013获取喷嘴检测结果:" + strResult, 0);
+            //                                SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
+            //                            }
+            //                            else
+            //                            {
+            //                                ShowLog("10013获取喷嘴检测结果失败：结果为空!", 1);
+            //                                //strMessage = "获取结果失败：结果为空!";
+            //                            }
+            //                        }
+            //                    }
+
+            //                }
+            //                break;
+            //            case 10014:
+            //                //喷嘴检测结果256CSN
+            //                if (workStatusInfo.nWorkStatus == 0)
+            //                {
+            //                    int iIndex = hsl.ReadUShort("D3019", 1)[0];
+            //                    WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
+            //                    if (wp == null)
+            //                    {
+            //                        ShowLog("喷嘴清洗后256CSN未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+            //                        return;
+            //                    }
+            //                    int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
+            //                    List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+            //                    if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+            //                    {
+            //                        if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+            //                        {
+
+            //                            Task.Run(() => {
+            //                                Invoke(new Action(() => {
+            //                                    ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["256CSN.图像源1"];
+            //                                    ImageBaseData pic = tool.ModuResult.ImageData;
+            //                                    Image img = ImageBaseDataToBitmap(pic);
+            //                                    wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
+            //                                    SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
+            //                                }));
+            //                            });
+
+            //                            //获取流程结果
+            //                            string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+            //                            if (strResult != null)
+            //                            {
+            //                                //实时显示结果
+            //                                Invoke(new Action(() => {
+            //                                    MouseResult.Text = strResult == "OK" ? "OK" : "NG";
+            //                                    MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
+            //                                }));
+            //                                ShowLog("10014获取喷嘴检测结果:" + strResult, 0);
+            //                                SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
+            //                            }
+            //                            else
+            //                            {
+            //                                ShowLog("10014获取喷嘴检测结果失败：结果为空!", 1);
+            //                                //strMessage = "获取结果失败：结果为空!";
+            //                            }
+            //                        }
+            //                    }
+
+            //                }
+            //                break;
+            //            case 10015:
+            //                //喷嘴检测结果115AS
+            //                if (workStatusInfo.nWorkStatus == 0)
+            //                {
+            //                    int iIndex = hsl.ReadUShort("D3019", 1)[0];
+            //                    WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
+            //                    if (wp == null)
+            //                    {
+            //                        ShowLog("喷嘴清洗后115AS未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+            //                        return;
+            //                    }
+            //                    int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
+            //                    List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+            //                    if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+            //                    {
+            //                        if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+            //                        {
+
+            //                            Task.Run(() => {
+            //                                Invoke(new Action(() => {
+            //                                    ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["115AS.图像源1"];
+            //                                    ImageBaseData pic = tool.ModuResult.ImageData;
+            //                                    Image img = ImageBaseDataToBitmap(pic);
+            //                                    wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
+            //                                    SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
+            //                                }));
+            //                            });
+
+            //                            //获取流程结果
+            //                            string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+            //                            if (strResult != null)
+            //                            {
+            //                                //实时显示结果
+            //                                Invoke(new Action(() => {
+            //                                    MouseResult.Text = strResult == "OK" ? "OK" : "NG";
+            //                                    MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
+            //                                }));
+            //                                ShowLog("10015获取喷嘴检测结果:" + strResult, 0);
+            //                                SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
+            //                            }
+            //                            else
+            //                            {
+            //                                ShowLog("10015获取喷嘴检测结果失败：结果为空!", 1);
+            //                                //strMessage = "获取结果失败：结果为空!";
+            //                            }
+            //                        }
+            //                    }
+
+            //                }
+            //                break;
+            //            case 10009:
+            //                //喷嘴检测结果235CS
+            //                if (workStatusInfo.nWorkStatus == 0)
+            //                {
+            //                    int iIndex = hsl.ReadUShort("D3019", 1)[0];
+            //                    WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
+            //                    if (wp == null)
+            //                    {
+            //                        ShowLog("喷嘴清洗后235CS未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+            //                        return;
+            //                    }
+            //                    int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
+            //                    List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+            //                    if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+            //                    {
+            //                        if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+            //                        {
+
+            //                            Task.Run(() => {
+            //                                Invoke(new Action(() => {
+            //                                    ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["235CS.图像源1"];
+            //                                    ImageBaseData pic = tool.ModuResult.ImageData;
+            //                                    Image img = ImageBaseDataToBitmap(pic);
+            //                                    wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
+            //                                    SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
+            //                                }));
+            //                            });
+
+            //                            //获取流程结果
+            //                            string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+            //                            if (strResult != null)
+            //                            {
+            //                                //实时显示结果
+            //                                Invoke(new Action(() => {
+            //                                    MouseResult.Text = strResult == "OK" ? "OK" : "NG";
+            //                                    MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
+            //                                }));
+            //                                ShowLog("10009获取喷嘴检测结果:" + strResult, 0);
+            //                                SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
+            //                            }
+            //                            else
+            //                            {
+            //                                ShowLog("10009获取喷嘴检测结果失败：结果为空!", 1);
+            //                                //strMessage = "获取结果失败：结果为空!";
+            //                            }
+            //                        }
+            //                    }
+
+            //                }
+            //                break;
+            //            case 10011:
+            //                //喷嘴检测默认结果OCR
+            //                if (workStatusInfo.nWorkStatus == 0)
+            //                {
+            //                    int iIndex = hsl.ReadUShort("D3019", 1)[0];
+            //                    WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
+            //                    if (wp == null)
+            //                    {
+            //                        ShowLog("喷嘴清洗后OCR未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+            //                        return;
+            //                    }
+            //                    int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
+            //                    List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+            //                    if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+            //                    {
+            //                        if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+            //                        {
+
+            //                            Task.Run(() => {
+            //                                Invoke(new Action(() => {
+            //                                    ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["OCR.图像源1"];
+            //                                    ImageBaseData pic = tool.ModuResult.ImageData;
+            //                                    Image img = ImageBaseDataToBitmap(pic);
+            //                                    wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
+            //                                    SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
+            //                                }));
+            //                            });
+
+            //                            //获取流程结果
+            //                            string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+            //                            if (strResult != null)
+            //                            {
+            //                                //实时显示结果
+            //                                Invoke(new Action(() => {
+            //                                    MouseResult.Text = strResult == "OK" ? "OK" : "NG";
+            //                                    MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
+            //                                }));
+            //                                ShowLog("10011获取喷嘴检测结果:" + strResult, 0);
+            //                                SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
+            //                            }
+            //                            else
+            //                            {
+            //                                ShowLog("10011获取喷嘴检测结果失败：结果为空!", 1);
+            //                                //strMessage = "获取结果失败：结果为空!";
+            //                            }
+            //                        }
+            //                    }
+
+            //                }
+            //                break;
+            //            case 10032:
+            //                //喷嘴检测结果185N
+            //                if (workStatusInfo.nWorkStatus == 0)
+            //                {
+            //                    int iIndex = hsl.ReadUShort("D3019", 1)[0];
+            //                    WorkPiece wp = SoftConfig.lstWorkPiece.Where(x => x.Index == iIndex).FirstOrDefault();
+            //                    if (wp == null)
+            //                    {
+            //                        ShowLog("喷嘴清洗后185N未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+            //                        return;
+            //                    }
+            //                    int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
+            //                    List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+            //                    if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+            //                    {
+            //                        if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+            //                        {
+
+            //                            Task.Run(() => {
+            //                                Invoke(new Action(() => {
+            //                                    ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["185N.图像源1"];
+            //                                    ImageBaseData pic = tool.ModuResult.ImageData;
+            //                                    Image img = ImageBaseDataToBitmap(pic);
+            //                                    wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
+            //                                    SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
+            //                                }));
+            //                            });
+
+            //                            //获取流程结果
+            //                            string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+            //                            if (strResult != null)
+            //                            {
+            //                                //实时显示结果
+            //                                Invoke(new Action(() => {
+            //                                    MouseResult.Text = strResult == "OK" ? "OK" : "NG";
+            //                                    MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
+            //                                }));
+            //                                ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果:" + strResult, 0);
+            //                                SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
+            //                            }
+            //                            else
+            //                            {
+            //                                ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果失败：结果为空!", 1);
+            //                                //strMessage = "获取结果失败：结果为空!";
+            //                            }
+            //                        }
+            //                    }
+
+            //                }
+            //                break;
+            //            case 10031:
+            //                //喷嘴检测结果140N
+            //                if (workStatusInfo.nWorkStatus == 0)
+            //                {
+            //                    int iIndex = hsl.ReadUShort("D3019", 1)[0];
+            //                    WorkPiece wp = SoftConfig.lstWorkPiece.Where(x => x.Index == iIndex).FirstOrDefault();
+            //                    if (wp == null)
+            //                    {
+            //                        ShowLog("喷嘴清洗后140N未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+            //                        return;
+            //                    }
+            //                    int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
+            //                    List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+            //                    if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+            //                    {
+            //                        if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+            //                        {
+
+            //                            Task.Run(() => {
+            //                                Invoke(new Action(() => {
+            //                                    ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["140N.图像源1"];
+            //                                    ImageBaseData pic = tool.ModuResult.ImageData;
+            //                                    Image img = ImageBaseDataToBitmap(pic);
+            //                                    wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
+            //                                    SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
+            //                                }));
+            //                            });
+
+            //                            //获取流程结果
+            //                            string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+            //                            if (strResult != null)
+            //                            {
+            //                                //实时显示结果
+            //                                Invoke(new Action(() => {
+            //                                    MouseResult.Text = strResult == "OK" ? "OK" : "NG";
+            //                                    MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
+            //                                }));
+            //                                ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果:" + strResult, 0);
+            //                                SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
+            //                            }
+            //                            else
+            //                            {
+            //                                ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果失败：结果为空!", 1);
+            //                                //strMessage = "获取结果失败：结果为空!";
+            //                            }
+            //                        }
+            //                    }
+
+            //                }
+            //                break;
+            //            case 10030:
+            //                //喷嘴检测结果161SN
+            //                if (workStatusInfo.nWorkStatus == 0)
+            //                {
+            //                    int iIndex = hsl.ReadUShort("D3019", 1)[0];
+            //                    WorkPiece wp = SoftConfig.lstWorkPiece.Where(x => x.Index == iIndex).FirstOrDefault();
+            //                    if (wp == null)
+            //                    {
+            //                        ShowLog("喷嘴清洗后161SN未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+            //                        return;
+            //                    }
+            //                    int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
+            //                    List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+            //                    if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+            //                    {
+            //                        if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+            //                        {
+
+            //                            Task.Run(() => {
+            //                                Invoke(new Action(() => {
+            //                                    ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["161SN.图像源1"];
+            //                                    ImageBaseData pic = tool.ModuResult.ImageData;
+            //                                    Image img = ImageBaseDataToBitmap(pic);
+            //                                    wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
+            //                                    SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
+            //                                }));
+            //                            });
+
+            //                            //获取流程结果
+            //                            string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+            //                            if (strResult != null)
+            //                            {
+            //                                //实时显示结果
+            //                                Invoke(new Action(() => {
+            //                                    MouseResult.Text = strResult == "OK" ? "OK" : "NG";
+            //                                    MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
+            //                                }));
+            //                                ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果:" + strResult, 0);
+            //                                SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
+            //                            }
+            //                            else
+            //                            {
+            //                                ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果失败：结果为空!", 1);
+            //                                //strMessage = "获取结果失败：结果为空!";
+            //                            }
+            //                        }
+            //                    }
+
+            //                }
+            //                break;
+            //            case 10016:
+            //                //喷嘴检测结果225CSN
+            //                if (workStatusInfo.nWorkStatus == 0)
+            //                {
+            //                    int iIndex = hsl.ReadUShort("D3019", 1)[0];
+            //                    WorkPiece wp = SoftConfig.lstWorkPiece.Where(x => x.Index == iIndex).FirstOrDefault();
+            //                    if (wp == null)
+            //                    {
+            //                        ShowLog("喷嘴清洗后225CSN未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+            //                        return;
+            //                    }
+            //                    int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
+            //                    List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+            //                    if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+            //                    {
+            //                        if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+            //                        {
+
+            //                            Task.Run(() => {
+            //                                Invoke(new Action(() => {
+            //                                    ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["225CSN.图像源1"];
+            //                                    ImageBaseData pic = tool.ModuResult.ImageData;
+            //                                    Image img = ImageBaseDataToBitmap(pic);
+            //                                    wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
+            //                                    SaveImage(img,SoftConfig.ImagePath + "\\" + wp.MouseAfter);
+
+            //                                }));
+            //                            });
+
+            //                            //获取流程结果
+            //                            string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+            //                            if (strResult != null)
+            //                            {
+            //                                //实时显示结果
+            //                                Invoke(new Action(() => {
+            //                                    MouseResult.Text = strResult == "OK" ? "OK" : "NG";
+            //                                    MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
+            //                                }));
+            //                                ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果:" + strResult, 0);
+            //                                SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
+            //                            }
+            //                            else
+            //                            {
+            //                                ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果失败：结果为空!", 1);
+            //                                //strMessage = "获取结果失败：结果为空!";
+            //                            }
+            //                        }
+            //                    }
+
+            //                }
+            //                break;
+            //            case 10034:
+            //                //喷嘴检测结果230C
+            //                if (workStatusInfo.nWorkStatus == 0)
+            //                {
+            //                    int iIndex = hsl.ReadUShort("D3019", 1)[0];
+            //                    WorkPiece wp = SoftConfig.lstWorkPiece.Where(x => x.Index == iIndex).FirstOrDefault();
+            //                    if (wp == null)
+            //                    {
+            //                        ShowLog("喷嘴清洗后230C未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+            //                        return;
+            //                    }
+            //                    int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
+            //                    List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+            //                    if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+            //                    {
+            //                        if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+            //                        {
+
+            //                            Task.Run(() => {
+            //                                Invoke(new Action(() => {
+            //                                    ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["230C.图像源1"];
+            //                                    ImageBaseData pic = tool.ModuResult.ImageData;
+            //                                    Image img = ImageBaseDataToBitmap(pic);
+            //                                    wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
+            //                                    SaveImage(img, SoftConfig.ImagePath + "\\" + wp.MouseAfter);
+
+            //                                }));
+            //                            });
+
+            //                            //获取流程结果
+            //                            string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+            //                            if (strResult != null)
+            //                            {
+            //                                //实时显示结果
+            //                                Invoke(new Action(() => {
+            //                                    MouseResult.Text = strResult == "OK" ? "OK" : "NG";
+            //                                    MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
+            //                                }));
+            //                                ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果:" + strResult, 0);
+            //                                SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
+            //                            }
+            //                            else
+            //                            {
+            //                                ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果失败：结果为空!", 1);
+            //                                //strMessage = "获取结果失败：结果为空!";
+            //                            }
+            //                        }
+            //                    }
+
+            //                }
+            //                break;
+            //            case 10035:
+            //                //喷嘴检测结果235C
+            //                if (workStatusInfo.nWorkStatus == 0)
+            //                {
+            //                    int iIndex = hsl.ReadUShort("D3019", 1)[0];
+            //                    WorkPiece wp = SoftConfig.lstWorkPiece.Where(x => x.Index == iIndex).FirstOrDefault();
+            //                    if (wp == null)
+            //                    {
+            //                        ShowLog("喷嘴清洗后235C未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+            //                        return;
+            //                    }
+            //                    int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
+            //                    List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+            //                    if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+            //                    {
+            //                        if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+            //                        {
+
+            //                            Task.Run(() => {
+            //                                Invoke(new Action(() => {
+            //                                    ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["235C.图像源1"];
+            //                                    ImageBaseData pic = tool.ModuResult.ImageData;
+            //                                    Image img = ImageBaseDataToBitmap(pic);
+            //                                    wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
+            //                                    SaveImage(img, SoftConfig.ImagePath + "\\" + wp.MouseAfter);
+
+            //                                }));
+            //                            });
+
+            //                            //获取流程结果
+            //                            string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+            //                            if (strResult != null)
+            //                            {
+            //                                //实时显示结果
+            //                                Invoke(new Action(() => {
+            //                                    MouseResult.Text = strResult == "OK" ? "OK" : "NG";
+            //                                    MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
+            //                                }));
+            //                                ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果:" + strResult, 0);
+            //                                SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
+            //                            }
+            //                            else
+            //                            {
+            //                                ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果失败：结果为空!", 1);
+            //                                //strMessage = "获取结果失败：结果为空!";
+            //                            }
+            //                        }
+            //                    }
+
+            //                }
+            //                break;
+            //            case 10036:
+            //                //喷嘴检测结果240C
+            //                if (workStatusInfo.nWorkStatus == 0)
+            //                {
+            //                    int iIndex = hsl.ReadUShort("D3019", 1)[0];
+            //                    WorkPiece wp = SoftConfig.lstWorkPiece.Where(x => x.Index == iIndex).FirstOrDefault();
+            //                    if (wp == null)
+            //                    {
+            //                        ShowLog("喷嘴清洗后240C未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+            //                        return;
+            //                    }
+            //                    int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
+            //                    List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+            //                    if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+            //                    {
+            //                        if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+            //                        {
+
+            //                            Task.Run(() => {
+            //                                Invoke(new Action(() => {
+            //                                    ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["240C.图像源1"];
+            //                                    ImageBaseData pic = tool.ModuResult.ImageData;
+            //                                    Image img = ImageBaseDataToBitmap(pic);
+            //                                    wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
+            //                                    SaveImage(img, SoftConfig.ImagePath + "\\" + wp.MouseAfter);
+
+            //                                }));
+            //                            });
+
+            //                            //获取流程结果
+            //                            string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+            //                            if (strResult != null)
+            //                            {
+            //                                //实时显示结果
+            //                                Invoke(new Action(() => {
+            //                                    MouseResult.Text = strResult == "OK" ? "OK" : "NG";
+            //                                    MouseResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
+            //                                }));
+            //                                ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果:" + strResult, 0);
+            //                                SoftConfig.lstWorkPiece[iWorkPieceIndex].MouseResult = strResult;
+            //                            }
+            //                            else
+            //                            {
+            //                                ShowLog(workStatusInfo.nProcessID.ToString() + "获取喷嘴检测结果失败：结果为空!", 1);
+            //                                //strMessage = "获取结果失败：结果为空!";
+            //                            }
+            //                        }
+            //                    }
+
+            //                }
+            //                break;
+
+            //            case 10006:
+            //                //反光板清洗前
+            //                if (workStatusInfo.nWorkStatus == 0)
+            //                {
+            //                    ShowLog("收到反光板清洗前回调");
+            //                    int iIndex = hsl.ReadUShort("D3019", 1)[0];
+            //                    WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
+            //                    if (wp == null)
+            //                    {
+            //                        ShowLog("反光板清洗前未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+            //                        return;
+            //                    }
+            //                    Task.Run(() =>
+            //                    {
+            //                        Invoke(new Action(() =>
+            //                        {
+            //                            ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["反光板前.图像源1"];
+            //                            ImageBaseData pic = tool.ModuResult.ImageData;
+            //                            Image img = ImageBaseDataToBitmap(pic);
+            //                            wp.BoardBefore = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_2.jpg";
+            //                            SaveImage(img,SoftConfig.ImagePath + "\\" + wp.BoardBefore);
+            //                        }));
+            //                    });
+
+            //                }
+            //                break;
+            //            case 10007:
+            //                //反光板检测结果
+            //                if (workStatusInfo.nWorkStatus == 0)
+            //                {
+            //                    int iIndex = hsl.ReadUShort("D3019", 1)[0];
+            //                    WorkPiece wp = SoftConfig.lstWorkPiece.Where(x=>x.Index==iIndex).FirstOrDefault();
+            //                    if (wp == null)
+            //                    {
+            //                        ShowLog("反光板清洗后未找到对应工件数据,index=" + iIndex.ToString() + " 工件集合:" + GetIndexString(), 1);
+            //                        return;
+            //                    }
+            //                    int iWorkPieceIndex = GetWorkPieceIndexByIndex(iIndex);
+            //                    List<VmDynamicIODefine.IoNameInfo> ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+            //                    if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+            //                    {
+            //                        if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+            //                        {
+
+            //                            Task.Run(() =>
+            //                            {
+            //                                try
+            //                                {
+            //                                    int FlowCountStr = 0;
+            //                                    string FlowResultStr = "";
+            //                                    //获取流量信息
+            //                                    if (CurrentType == EWorkPieceType.superbig)
+            //                                    {
+            //                                        FlowCountStr = hsl.ReadUShort("D5024", 1)[0];
+            //                                        //FlowResultStr = hsl.ReadUShort("D5012",1)[0];
+            //                                    }
+            //                                    else
+            //                                    {
+            //                                        FlowCountStr = hsl.ReadUShort("D5022", 1)[0];
+            //                                        //FlowResultStr = hsl.ReadUShort("D5002", 1)[0];
+            //                                    }
+            //                                    ShowLog("获取到流量值：" + FlowCountStr.ToString());
+
+            //                                    //记录流量结果
+            //                                    var vValue = SoftConfig.lstFlow.Where(x => x.Ocr == SoftConfig.lstWorkPiece[iWorkPieceIndex].Ocr).SingleOrDefault();
+            //                                    int iThresholdValue = vValue == null ? 2000 : (int)vValue.Value;
+            //                                    ShowLog("获取到流量阈值：" + iThresholdValue.ToString());
+            //                                    FlowResultStr = FlowCountStr > iThresholdValue ? "OK" : "NG";
+            //                                    SoftConfig.lstWorkPiece[iWorkPieceIndex].FlowResult = FlowResultStr;
+            //                                    SoftConfig.lstWorkPiece[iWorkPieceIndex].FlowCount = FlowCountStr;
+            //                                    //流量结果给plc
+            //                                    hsl.WriteUshort("D5002", FlowCountStr > iThresholdValue ? (ushort)1 : (ushort)2);
+            //                                    Invoke(new Action(() =>
+            //                                    {
+            //                                        ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance["反光板.图像源1"];
+            //                                        ImageBaseData pic = tool.ModuResult.ImageData;
+            //                                        Image img = ImageBaseDataToBitmap(pic);
+            //                                        wp.BoardAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_4.jpg";
+            //                                        SaveImage(img, SoftConfig.ImagePath + "\\" + wp.BoardAfter);
+
+            //                                        FlowResult.Text = FlowResultStr;
+            //                                        FlowResult.ForeColor = FlowResultStr == "OK" ? Color.Chartreuse : Color.Red;
+            //                                        FlowCount.Text = FlowCountStr.ToString() + " ml/min";
+            //                                    }));
+            //                                    //多一次刷新
+            //                                    CmdNeedRefresh.Enqueue("refresh");
+            //                                }
+            //                                catch (Exception ex)
+            //                                {
+            //                                    ShowLog("获取流量异常："+ex.Message,1);
+            //                                }
+
+            //                            });
+
+
+            //                            //获取流程结果
+            //                            string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+            //                            if (strResult != null)
+            //                            {
+            //                                //实时显示结果
+            //                                Invoke(new Action(() => {
+            //                                    BoardResult.Text = strResult == "OK" ? "OK" : "NG";
+            //                                    BoardResult.ForeColor = strResult == "OK" ? Color.Chartreuse : Color.Red;
+            //                                }));
+            //                                ShowLog("10007获取反光板检测结果:" + strResult, 0);
+            //                                SoftConfig.lstWorkPiece[iWorkPieceIndex].ReflectBoardResult = strResult;
+
+            //                            }
+            //                            else
+            //                            {
+            //                                ShowLog("10007获取反光板结果失败：结果为空!", 1);
+            //                                //strMessage = "获取结果失败：结果为空!";
+            //                            }
+
+            //                            //显示
+            //                            //CmdNeedShow.Enqueue(iIndex);
+            //                        }
+            //                    }
+
+            //                }
+            //                break;
+            //        }
+            //        //回调后刷新示意图
+            //        CmdNeedRefresh.Enqueue("refresh");
+            //    }
+
+
+            //}
+            //catch (VmException ex)
+            //{
+            //    ShowLog("获取结果失败，错误码：0x" + Convert.ToString(ex.errorCode, 16),1);
+            //}
+            //catch (Exception ex)
+            //{
+            //    ShowLog("获取结果失败：" + Convert.ToString(ex.Message),1);
+            //}
+            #endregion
         }
 
         public void SaveImage(Image img,string strFile)

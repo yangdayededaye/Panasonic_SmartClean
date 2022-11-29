@@ -18,10 +18,10 @@ using System.Windows.Forms;
 namespace Panasonic_SmartClean
 {
 #pragma warning disable CS0246 // 未能找到类型或命名空间名“UIForm”(是否缺少 using 指令或程序集引用?)
-    public partial class FFlow : UIForm
+    public partial class FProcess : UIForm
 #pragma warning restore CS0246 // 未能找到类型或命名空间名“UIForm”(是否缺少 using 指令或程序集引用?)
     {
-        public FFlow()
+        public FProcess()
         {
             InitializeComponent();
             dv.AutoGenerateColumns = false;
@@ -31,7 +31,7 @@ namespace Panasonic_SmartClean
 
         private void btnNew_Click(object sender, EventArgs e)
         {
-            FFlowInfo f = new FFlowInfo(null);
+            FProcessInfo f = new FProcessInfo(null);
             f.ShowDialog();
             RefreshDv("");
         }
@@ -43,17 +43,17 @@ namespace Panasonic_SmartClean
 
         public void RefreshDv(string strKey)
         {
-            dv.DataSource = SoftConfig.db.Flow.Where(x => x.Ocr.Contains(strKey)).ToList();
+            dv.DataSource = SoftConfig.db.VisonProcess.Where(x => x.ProcessID.Contains(strKey)).ToList();
         }
 
-        private void dv_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        private void dv_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (dv.Columns[e.ColumnIndex].Name == "delete" && e.RowIndex >= 0)
             {
                 if (ShowAskDialog("确认删除吗？", false))
                 {
                     int id = int.Parse(dv.Rows[e.RowIndex].Cells[0].Value.ToString());
-                    var u = SoftConfig.db.Flow.Where(x => x.ThresholdIndex == id).Delete();
+                    var u = SoftConfig.db.VisonProcess.Where(x => x.ProcessIndex == id).Delete();
                     SoftConfig.db.SaveChanges();
                     Util.initDB();
                     ShowSuccessTip("删除成功");
@@ -62,13 +62,13 @@ namespace Panasonic_SmartClean
             }
         }
 
-        private void dv_CellContentDoubleClick(object sender, DataGridViewCellEventArgs e)
+        private void dv_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex>=0)
+            if (e.RowIndex >= 0)
             {
-                FlowCls d = new FlowCls(dv.Rows[e.RowIndex].Cells[1].Value.ToString(), int.Parse(dv.Rows[e.RowIndex].Cells[2].Value.ToString()));
-                d.ID = int.Parse(dv.Rows[e.RowIndex].Cells[0].Value.ToString());
-                FFlowInfo f = new FFlowInfo(d);
+                int id = int.Parse(dv.Rows[e.RowIndex].Cells[0].Value.ToString());
+                VisonProcess p = SoftConfig.db.VisonProcess.Where(x => x.ProcessIndex == id).ToList()[0];
+                FProcessInfo f = new FProcessInfo(p);
                 f.ShowDialog();
                 RefreshDv("");
             }
