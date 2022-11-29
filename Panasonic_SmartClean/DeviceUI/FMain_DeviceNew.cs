@@ -79,59 +79,65 @@ namespace Panasonic_SmartClean
                 //加载视觉
                 try
                 {
-                    VmSolution.Load(@ConfigurationManager.AppSettings["Sol"].ToString());//加载
+                    VmSolution.Load(SoftConfig.ini.IniReadValue("SOFT", "Sol"));//加载
                     SoftConfig.processList = GetCurrentSolProcedureList();
-                    //设置图像源 调用拍照流程
-                    ImageSourceModuleTool imageSourceToolBig = (ImageSourceModuleTool)VmSolution.Instance["大型.图像源1"];
-                    imageSourceToolBig.ModuParams.ImageSourceType = ImageSourceParam.ImageSourceTypeEnum.LocalImage;
-                    imageSourceToolBig.AddInputImageByPath(System.Environment.CurrentDirectory + "\\PreLoadBig.jpg");
-                    VmProcedure procedureBig = VmSolution.Instance["大型"] as VmProcedure;
-                    procedureBig.OnWorkEndStatusCallBack += VmProcedure_OnWorkEndStatusCallBack;
 
-                    ImageSourceModuleTool imageSourceToolSmall = (ImageSourceModuleTool)VmSolution.Instance["小型(上位机).图像源1"];
-                    imageSourceToolSmall.ModuParams.ImageSourceType = ImageSourceParam.ImageSourceTypeEnum.LocalImage;
-                    imageSourceToolSmall.AddInputImageByPath(System.Environment.CurrentDirectory + "\\PreLoadSmall.jpg");
-                    VmProcedure procedureSmall = VmSolution.Instance["小型(上位机)"] as VmProcedure;
-                    procedureSmall.OnWorkEndStatusCallBack += VmProcedure_OnWorkEndStatusCallBack;
-
-                    if (procedureBig != null)
+                    var vSmall = SoftConfig.db.VisonProcess.Where(x => x.Type == "小型").ToList();
+                    var vBig = SoftConfig.db.VisonProcess.Where(x => x.Type == "大型").ToList();
+                    if ((vSmall != null && vSmall.Count > 0) &&(vBig != null && vBig.Count > 0))
                     {
-                        lg.SendCommand("调用大型", 0);
-                        IsPreLoadFinish = false;
-                        procedureBig.Run();
-                        while (!IsPreLoadFinish)
-                        {
-                            Task.Delay(500);
-                            lg.SendCommand("等待大型回调", 0);
-                        }
-                    }
+                        //设置图像源 调用拍照流程
+                        ImageSourceModuleTool imageSourceToolBig = (ImageSourceModuleTool)VmSolution.Instance[vBig[0].ProcessName+"图像源1"];
+                        imageSourceToolBig.ModuParams.ImageSourceType = ImageSourceParam.ImageSourceTypeEnum.LocalImage;
+                        imageSourceToolBig.AddInputImageByPath(System.Environment.CurrentDirectory + "\\PreLoadBig.jpg");
+                        VmProcedure procedureBig = VmSolution.Instance[vBig[0].ProcessName] as VmProcedure;
+                        procedureBig.OnWorkEndStatusCallBack += VmProcedure_OnWorkEndStatusCallBack;
 
-                    if (procedureSmall != null)
-                    {
-                        lg.SendCommand("调用小型", 0);
-                        IsPreLoadFinish = false;
-                        procedureSmall.Run();
-                        while (!IsPreLoadFinish)
-                        {
-                            Task.Delay(500);
-                            lg.SendCommand("等待小型回调", 0);
-                        }
-                    }
+                        ImageSourceModuleTool imageSourceToolSmall = (ImageSourceModuleTool)VmSolution.Instance[vSmall[0].ProcessName+".图像源1"];
+                        imageSourceToolSmall.ModuParams.ImageSourceType = ImageSourceParam.ImageSourceTypeEnum.LocalImage;
+                        imageSourceToolSmall.AddInputImageByPath(System.Environment.CurrentDirectory + "\\PreLoadSmall.jpg");
+                        VmProcedure procedureSmall = VmSolution.Instance[vSmall[0].ProcessName] as VmProcedure;
+                        procedureSmall.OnWorkEndStatusCallBack += VmProcedure_OnWorkEndStatusCallBack;
 
-                    //更换图像源 注销回调
-                    imageSourceToolBig.ModuParams.ImageSourceType = ImageSourceParam.ImageSourceTypeEnum.Camera;
-                    imageSourceToolBig.ModuParams.SetParamValue("CameraID","27");
-                    imageSourceToolSmall.ModuParams.ImageSourceType = ImageSourceParam.ImageSourceTypeEnum.Camera;
-                    imageSourceToolSmall.ModuParams.SetParamValue("CameraID", "27");
-                    procedureBig.OnWorkEndStatusCallBack -= VmProcedure_OnWorkEndStatusCallBack;
-                    procedureSmall.OnWorkEndStatusCallBack -= VmProcedure_OnWorkEndStatusCallBack;
+                        if (procedureBig != null)
+                        {
+                            lg.SendCommand("调用大型", 0);
+                            IsPreLoadFinish = false;
+                            procedureBig.Run();
+                            while (!IsPreLoadFinish)
+                            {
+                                Task.Delay(500);
+                                lg.SendCommand("等待大型回调", 0);
+                            }
+                        }
+
+                        if (procedureSmall != null)
+                        {
+                            lg.SendCommand("调用小型", 0);
+                            IsPreLoadFinish = false;
+                            procedureSmall.Run();
+                            while (!IsPreLoadFinish)
+                            {
+                                Task.Delay(500);
+                                lg.SendCommand("等待小型回调", 0);
+                            }
+                        }
+
+                        //更换图像源 注销回调
+                        imageSourceToolBig.ModuParams.ImageSourceType = ImageSourceParam.ImageSourceTypeEnum.Camera;
+                        imageSourceToolBig.ModuParams.SetParamValue("CameraID", "27");
+                        imageSourceToolSmall.ModuParams.ImageSourceType = ImageSourceParam.ImageSourceTypeEnum.Camera;
+                        imageSourceToolSmall.ModuParams.SetParamValue("CameraID", "27");
+                        procedureBig.OnWorkEndStatusCallBack -= VmProcedure_OnWorkEndStatusCallBack;
+                        procedureSmall.OnWorkEndStatusCallBack -= VmProcedure_OnWorkEndStatusCallBack;
+                    }
 
                     lightScan.State = UILightState.On;
                 }
                 catch (Exception ex)
                 {
                     lightScan.State = UILightState.Off;
-                    lg.SendCommand("打开视觉文件失败："+ex.Message,1);
+                    lg.SendCommand("打开视觉文件失败："+ SoftConfig.ini.IniReadValue("SOFT", "Sol") +" "+ ex.Message,1);
                 }
 
             });
