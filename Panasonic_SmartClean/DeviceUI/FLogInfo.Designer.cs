@@ -52,6 +52,7 @@
             this.picBoardAfter.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.picBoardAfter.TabIndex = 191;
             this.picBoardAfter.TabStop = false;
+            this.picBoardAfter.DoubleClick += new System.EventHandler(this.picBoardAfter_DoubleClick);
             // 
             // picBoardBefore
             // 
@@ -61,6 +62,7 @@
             this.picBoardBefore.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.picBoardBefore.TabIndex = 190;
             this.picBoardBefore.TabStop = false;
+            this.picBoardBefore.DoubleClick += new System.EventHandler(this.picBoardBefore_DoubleClick);
             // 
             // picMouseAfter
             // 
@@ -70,6 +72,7 @@
             this.picMouseAfter.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.picMouseAfter.TabIndex = 189;
             this.picMouseAfter.TabStop = false;
+            this.picMouseAfter.DoubleClick += new System.EventHandler(this.picMouseAfter_DoubleClick);
             // 
             // picMouseBefore
             // 
@@ -79,6 +82,7 @@
             this.picMouseBefore.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.picMouseBefore.TabIndex = 188;
             this.picMouseBefore.TabStop = false;
+            this.picMouseBefore.DoubleClick += new System.EventHandler(this.picMouseBefore_DoubleClick);
             // 
             // uiLabel7
             // 

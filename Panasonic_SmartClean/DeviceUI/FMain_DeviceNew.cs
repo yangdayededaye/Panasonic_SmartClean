@@ -87,7 +87,7 @@ namespace Panasonic_SmartClean
                     if ((vSmall != null && vSmall.Count > 0) &&(vBig != null && vBig.Count > 0))
                     {
                         //设置图像源 调用拍照流程
-                        ImageSourceModuleTool imageSourceToolBig = (ImageSourceModuleTool)VmSolution.Instance[vBig[0].ProcessName+"图像源1"];
+                        ImageSourceModuleTool imageSourceToolBig = (ImageSourceModuleTool)VmSolution.Instance[vBig[0].ProcessName+".图像源1"];
                         imageSourceToolBig.ModuParams.ImageSourceType = ImageSourceParam.ImageSourceTypeEnum.LocalImage;
                         imageSourceToolBig.AddInputImageByPath(System.Environment.CurrentDirectory + "\\PreLoadBig.jpg");
                         VmProcedure procedureBig = VmSolution.Instance[vBig[0].ProcessName] as VmProcedure;

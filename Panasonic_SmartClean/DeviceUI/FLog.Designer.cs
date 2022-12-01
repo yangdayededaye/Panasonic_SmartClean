@@ -30,25 +30,17 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
             this.uiLabel1 = new Sunny.UI.UILabel();
             this.cbUser = new Sunny.UI.UIComboBox();
             this.dpUseEnd = new Sunny.UI.UIDatetimePicker();
             this.dpUseStart = new Sunny.UI.UIDatetimePicker();
             this.uiLabel2 = new Sunny.UI.UILabel();
             this.dv = new Sunny.UI.UIDataGridView();
-            this.btnStart = new Sunny.UI.UIButton();
-            this.uiLabel3 = new Sunny.UI.UILabel();
-            this.uiLabel4 = new Sunny.UI.UILabel();
-            this.cbMouse = new Sunny.UI.UIComboBox();
-            this.uiLabel5 = new Sunny.UI.UILabel();
-            this.cbBoard = new Sunny.UI.UIComboBox();
-            this.uiLabel6 = new Sunny.UI.UILabel();
-            this.cbFlow = new Sunny.UI.UIComboBox();
             this.index = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.taskno = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.workpieceindex = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -64,6 +56,15 @@
             this.image2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.image3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.image4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.btnStart = new Sunny.UI.UIButton();
+            this.uiLabel3 = new Sunny.UI.UILabel();
+            this.uiLabel4 = new Sunny.UI.UILabel();
+            this.cbMouse = new Sunny.UI.UIComboBox();
+            this.uiLabel5 = new Sunny.UI.UILabel();
+            this.cbBoard = new Sunny.UI.UIComboBox();
+            this.uiLabel6 = new Sunny.UI.UILabel();
+            this.cbFlow = new Sunny.UI.UIComboBox();
+            this.btnExport = new Sunny.UI.UIButton();
             ((System.ComponentModel.ISupportInitialize)(this.dv)).BeginInit();
             this.SuspendLayout();
             // 
@@ -151,20 +152,20 @@
             // 
             this.dv.AllowUserToAddRows = false;
             this.dv.AllowUserToDeleteRows = false;
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(243)))), ((int)(((byte)(255)))));
-            this.dv.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle11.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(243)))), ((int)(((byte)(255)))));
+            this.dv.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle11;
             this.dv.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.dv.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dv.BackgroundColor = System.Drawing.Color.White;
             this.dv.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(146)))), ((int)(((byte)(146)))), ((int)(((byte)(146)))));
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(160)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dv.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle12.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(146)))), ((int)(((byte)(146)))), ((int)(((byte)(146)))));
+            dataGridViewCellStyle12.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle12.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle12.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(160)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle12.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle12.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dv.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle12;
             this.dv.ColumnHeadersHeight = 32;
             this.dv.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this.dv.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -183,14 +184,14 @@
             this.image2,
             this.image3,
             this.image4});
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(48)))), ((int)(((byte)(48)))));
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(155)))), ((int)(((byte)(200)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(48)))), ((int)(((byte)(48)))));
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dv.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle13.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle13.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle13.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(48)))), ((int)(((byte)(48)))));
+            dataGridViewCellStyle13.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(155)))), ((int)(((byte)(200)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle13.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(48)))), ((int)(((byte)(48)))));
+            dataGridViewCellStyle13.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dv.DefaultCellStyle = dataGridViewCellStyle13;
             this.dv.EnableHeadersVisualStyles = false;
             this.dv.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.dv.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(76)))), ((int)(((byte)(76)))));
@@ -198,17 +199,18 @@
             this.dv.Name = "dv";
             this.dv.ReadOnly = true;
             this.dv.RectColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(76)))), ((int)(((byte)(76)))));
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(243)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle4.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle4.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(48)))), ((int)(((byte)(48)))));
-            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(160)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dv.RowHeadersDefaultCellStyle = dataGridViewCellStyle4;
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle5.BackColor = System.Drawing.Color.White;
-            this.dv.RowsDefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle14.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(243)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle14.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle14.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(48)))), ((int)(((byte)(48)))));
+            dataGridViewCellStyle14.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(160)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle14.SelectionForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle14.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dv.RowHeadersDefaultCellStyle = dataGridViewCellStyle14;
+            this.dv.RowHeight = 27;
+            dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle15.BackColor = System.Drawing.Color.White;
+            this.dv.RowsDefaultCellStyle = dataGridViewCellStyle15;
             this.dv.RowTemplate.Height = 27;
             this.dv.ScrollBarColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(76)))), ((int)(((byte)(76)))));
             this.dv.SelectedIndex = -1;
@@ -220,16 +222,126 @@
             this.dv.ZoomScaleRect = new System.Drawing.Rectangle(0, 0, 0, 0);
             this.dv.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dv_CellClick);
             // 
+            // index
+            // 
+            this.index.DataPropertyName = "LogIndex";
+            this.index.HeaderText = "index";
+            this.index.Name = "index";
+            this.index.ReadOnly = true;
+            this.index.Visible = false;
+            // 
+            // taskno
+            // 
+            this.taskno.DataPropertyName = "TaskIndex";
+            this.taskno.HeaderText = "任务号";
+            this.taskno.Name = "taskno";
+            this.taskno.ReadOnly = true;
+            // 
+            // workpieceindex
+            // 
+            this.workpieceindex.DataPropertyName = "WorkPieceIndex";
+            this.workpieceindex.HeaderText = "序号";
+            this.workpieceindex.Name = "workpieceindex";
+            this.workpieceindex.ReadOnly = true;
+            // 
+            // BarCode
+            // 
+            this.BarCode.DataPropertyName = "BarCode";
+            this.BarCode.HeaderText = "条码";
+            this.BarCode.Name = "BarCode";
+            this.BarCode.ReadOnly = true;
+            // 
+            // OCR
+            // 
+            this.OCR.DataPropertyName = "Ocr";
+            this.OCR.HeaderText = "OCR";
+            this.OCR.Name = "OCR";
+            this.OCR.ReadOnly = true;
+            // 
+            // currentsort
+            // 
+            this.currentsort.DataPropertyName = "LogTime";
+            this.currentsort.HeaderText = "时间";
+            this.currentsort.Name = "currentsort";
+            this.currentsort.ReadOnly = true;
+            // 
+            // specamount
+            // 
+            this.specamount.DataPropertyName = "Type";
+            this.specamount.HeaderText = "类别";
+            this.specamount.Name = "specamount";
+            this.specamount.ReadOnly = true;
+            // 
+            // totalamount
+            // 
+            this.totalamount.DataPropertyName = "MouseResult";
+            this.totalamount.HeaderText = "吸嘴";
+            this.totalamount.Name = "totalamount";
+            this.totalamount.ReadOnly = true;
+            // 
+            // boardresult
+            // 
+            this.boardresult.DataPropertyName = "ReflectPanelResult";
+            this.boardresult.HeaderText = "反光板";
+            this.boardresult.Name = "boardresult";
+            this.boardresult.ReadOnly = true;
+            // 
+            // FlowResult
+            // 
+            this.FlowResult.DataPropertyName = "FlowResult";
+            this.FlowResult.HeaderText = "流量";
+            this.FlowResult.Name = "FlowResult";
+            this.FlowResult.ReadOnly = true;
+            // 
+            // FlowCount
+            // 
+            this.FlowCount.DataPropertyName = "FlowCount";
+            this.FlowCount.HeaderText = "流量值";
+            this.FlowCount.Name = "FlowCount";
+            this.FlowCount.ReadOnly = true;
+            // 
+            // image1
+            // 
+            this.image1.DataPropertyName = "MouseBefore";
+            this.image1.HeaderText = "image1";
+            this.image1.Name = "image1";
+            this.image1.ReadOnly = true;
+            this.image1.Visible = false;
+            // 
+            // image2
+            // 
+            this.image2.DataPropertyName = "BoardBefore";
+            this.image2.HeaderText = "image2";
+            this.image2.Name = "image2";
+            this.image2.ReadOnly = true;
+            this.image2.Visible = false;
+            // 
+            // image3
+            // 
+            this.image3.DataPropertyName = "MouseAfter";
+            this.image3.HeaderText = "image3";
+            this.image3.Name = "image3";
+            this.image3.ReadOnly = true;
+            this.image3.Visible = false;
+            // 
+            // image4
+            // 
+            this.image4.DataPropertyName = "BoardAfter";
+            this.image4.HeaderText = "image4";
+            this.image4.Name = "image4";
+            this.image4.ReadOnly = true;
+            this.image4.Visible = false;
+            // 
             // btnStart
             // 
             this.btnStart.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnStart.Font = new System.Drawing.Font("微软雅黑", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.btnStart.Location = new System.Drawing.Point(695, 105);
+            this.btnStart.Location = new System.Drawing.Point(630, 106);
             this.btnStart.MinimumSize = new System.Drawing.Size(1, 1);
             this.btnStart.Name = "btnStart";
             this.btnStart.Radius = 10;
             this.btnStart.RectSize = 2;
-            this.btnStart.Size = new System.Drawing.Size(224, 47);
+            this.btnStart.Size = new System.Drawing.Size(135, 47);
             this.btnStart.StyleCustomMode = true;
             this.btnStart.TabIndex = 146;
             this.btnStart.Text = "查询";
@@ -348,120 +460,38 @@
             this.cbFlow.TextAlignment = System.Drawing.ContentAlignment.MiddleLeft;
             this.cbFlow.ZoomScaleRect = new System.Drawing.Rectangle(0, 0, 0, 0);
             // 
-            // index
+            // btnExport
             // 
-            this.index.DataPropertyName = "LogIndex";
-            this.index.HeaderText = "index";
-            this.index.Name = "index";
-            this.index.ReadOnly = true;
-            this.index.Visible = false;
-            // 
-            // taskno
-            // 
-            this.taskno.DataPropertyName = "TaskIndex";
-            this.taskno.HeaderText = "任务号";
-            this.taskno.Name = "taskno";
-            this.taskno.ReadOnly = true;
-            // 
-            // workpieceindex
-            // 
-            this.workpieceindex.DataPropertyName = "WorkPieceIndex";
-            this.workpieceindex.HeaderText = "序号";
-            this.workpieceindex.Name = "workpieceindex";
-            this.workpieceindex.ReadOnly = true;
-            // 
-            // BarCode
-            // 
-            this.BarCode.DataPropertyName = "BarCode";
-            this.BarCode.HeaderText = "条码";
-            this.BarCode.Name = "BarCode";
-            this.BarCode.ReadOnly = true;
-            // 
-            // OCR
-            // 
-            this.OCR.DataPropertyName = "Ocr";
-            this.OCR.HeaderText = "OCR";
-            this.OCR.Name = "OCR";
-            this.OCR.ReadOnly = true;
-            // 
-            // currentsort
-            // 
-            this.currentsort.DataPropertyName = "LogTime";
-            this.currentsort.HeaderText = "时间";
-            this.currentsort.Name = "currentsort";
-            this.currentsort.ReadOnly = true;
-            // 
-            // specamount
-            // 
-            this.specamount.DataPropertyName = "Type";
-            this.specamount.HeaderText = "类别";
-            this.specamount.Name = "specamount";
-            this.specamount.ReadOnly = true;
-            // 
-            // totalamount
-            // 
-            this.totalamount.DataPropertyName = "MouseResult";
-            this.totalamount.HeaderText = "吸嘴";
-            this.totalamount.Name = "totalamount";
-            this.totalamount.ReadOnly = true;
-            // 
-            // boardresult
-            // 
-            this.boardresult.DataPropertyName = "ReflectPanelResult";
-            this.boardresult.HeaderText = "反光板";
-            this.boardresult.Name = "boardresult";
-            this.boardresult.ReadOnly = true;
-            // 
-            // FlowResult
-            // 
-            this.FlowResult.DataPropertyName = "FlowResult";
-            this.FlowResult.HeaderText = "流量";
-            this.FlowResult.Name = "FlowResult";
-            this.FlowResult.ReadOnly = true;
-            // 
-            // FlowCount
-            // 
-            this.FlowCount.DataPropertyName = "FlowCount";
-            this.FlowCount.HeaderText = "流量值";
-            this.FlowCount.Name = "FlowCount";
-            this.FlowCount.ReadOnly = true;
-            // 
-            // image1
-            // 
-            this.image1.DataPropertyName = "MouseBefore";
-            this.image1.HeaderText = "image1";
-            this.image1.Name = "image1";
-            this.image1.ReadOnly = true;
-            this.image1.Visible = false;
-            // 
-            // image2
-            // 
-            this.image2.DataPropertyName = "BoardBefore";
-            this.image2.HeaderText = "image2";
-            this.image2.Name = "image2";
-            this.image2.ReadOnly = true;
-            this.image2.Visible = false;
-            // 
-            // image3
-            // 
-            this.image3.DataPropertyName = "MouseAfter";
-            this.image3.HeaderText = "image3";
-            this.image3.Name = "image3";
-            this.image3.ReadOnly = true;
-            this.image3.Visible = false;
-            // 
-            // image4
-            // 
-            this.image4.DataPropertyName = "BoardAfter";
-            this.image4.HeaderText = "image4";
-            this.image4.Name = "image4";
-            this.image4.ReadOnly = true;
-            this.image4.Visible = false;
+            this.btnExport.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnExport.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(155)))), ((int)(((byte)(40)))));
+            this.btnExport.FillColor2 = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(155)))), ((int)(((byte)(40)))));
+            this.btnExport.FillHoverColor = System.Drawing.Color.FromArgb(((int)(((byte)(227)))), ((int)(((byte)(175)))), ((int)(((byte)(83)))));
+            this.btnExport.FillPressColor = System.Drawing.Color.FromArgb(((int)(((byte)(176)))), ((int)(((byte)(124)))), ((int)(((byte)(32)))));
+            this.btnExport.FillSelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(176)))), ((int)(((byte)(124)))), ((int)(((byte)(32)))));
+            this.btnExport.Font = new System.Drawing.Font("微软雅黑", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.btnExport.Location = new System.Drawing.Point(798, 106);
+            this.btnExport.MinimumSize = new System.Drawing.Size(1, 1);
+            this.btnExport.Name = "btnExport";
+            this.btnExport.Radius = 10;
+            this.btnExport.RectColor = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(155)))), ((int)(((byte)(40)))));
+            this.btnExport.RectHoverColor = System.Drawing.Color.FromArgb(((int)(((byte)(227)))), ((int)(((byte)(175)))), ((int)(((byte)(83)))));
+            this.btnExport.RectPressColor = System.Drawing.Color.FromArgb(((int)(((byte)(176)))), ((int)(((byte)(124)))), ((int)(((byte)(32)))));
+            this.btnExport.RectSelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(176)))), ((int)(((byte)(124)))), ((int)(((byte)(32)))));
+            this.btnExport.RectSize = 2;
+            this.btnExport.Size = new System.Drawing.Size(135, 47);
+            this.btnExport.Style = Sunny.UI.UIStyle.Orange;
+            this.btnExport.StyleCustomMode = true;
+            this.btnExport.TabIndex = 154;
+            this.btnExport.Text = "导出";
+            this.btnExport.TipsFont = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.btnExport.ZoomScaleRect = new System.Drawing.Rectangle(0, 0, 0, 0);
+            this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
             // 
             // FLog
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(962, 665);
+            this.Controls.Add(this.btnExport);
             this.Controls.Add(this.uiLabel6);
             this.Controls.Add(this.cbFlow);
             this.Controls.Add(this.uiLabel5);
@@ -553,5 +583,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn image2;
         private System.Windows.Forms.DataGridViewTextBoxColumn image3;
         private System.Windows.Forms.DataGridViewTextBoxColumn image4;
+        private Sunny.UI.UIButton btnExport;
     }
 }

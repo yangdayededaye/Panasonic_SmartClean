@@ -73,6 +73,31 @@ namespace Panasonic_SmartClean
                 case "超大型反光板NG槽位满":
                     hsl.WriteBool("M90", true);
                     break;
+
+                case "小型流通量NG槽位未取走":
+                    hsl.WriteBool("M1010", true);
+                    break;
+                case "小型吸嘴NG槽位未取走":
+                    hsl.WriteBool("M1011", true);
+                    break;
+                case "小型反光板NG槽位未取走":
+                    hsl.WriteBool("M1012", true);
+                    break;
+                case "小型破损NG槽位未取走":
+                    hsl.WriteBool("M1013", true);
+                    break;
+                case "大型流通量NG槽位未取走":
+                    hsl.WriteBool("M1014", true);
+                    break;
+                case "大型吸嘴NG槽位未取走":
+                    hsl.WriteBool("M1015", true);
+                    break;
+                case "大型反光板NG槽位未取走":
+                    hsl.WriteBool("M1016", true);
+                    break;
+                case "大型破损NG槽位未取走":
+                    hsl.WriteBool("M1017", true);
+                    break;
             }
 
             this.DialogResult = DialogResult.OK;

@@ -304,25 +304,83 @@ namespace Panasonic_SmartClean
                             FAttention f = new FAttention("大型吸嘴反光板破损NG槽位满");
                             f.ShowDialog();
                         }
-                        if (hsl.ReadBool("M359", 1)[0])
+                        //if (hsl.ReadBool("M359", 1)[0])
+                        //{
+                        //    hsl.WriteBool("M359", false);
+                        //    ShowLog("超大型通透检测NG槽位满");
+                        //    FAttention f = new FAttention("超大型通透检测NG槽位满");
+                        //    f.ShowDialog();
+                        //}
+                        //if (hsl.ReadBool("M360", 1)[0])
+                        //{
+                        //    hsl.WriteBool("M360", false);
+                        //    ShowLog("超大型吸嘴NG槽位满");
+                        //    FAttention f = new FAttention("超大型吸嘴NG槽位满");
+                        //    f.ShowDialog();
+                        //}
+                        //if (hsl.ReadBool("M361", 1)[0])
+                        //{
+                        //    hsl.WriteBool("M361", false);
+                        //    ShowLog("超大型反光板NG槽位满");
+                        //    FAttention f = new FAttention("超大型反光板NG槽位满");
+                        //    f.ShowDialog();
+                        //}
+
+                        if (hsl.ReadBool("M370", 1)[0])
                         {
-                            hsl.WriteBool("M359", false);
-                            ShowLog("超大型通透检测NG槽位满");
-                            FAttention f = new FAttention("超大型通透检测NG槽位满");
+                            hsl.WriteBool("M370", false);
+                            ShowLog("小型流通量NG槽位未取走");
+                            FAttention f = new FAttention("小型流通量NG槽位未取走");
                             f.ShowDialog();
                         }
-                        if (hsl.ReadBool("M360", 1)[0])
+                        if (hsl.ReadBool("M371", 1)[0])
                         {
-                            hsl.WriteBool("M360", false);
-                            ShowLog("超大型吸嘴NG槽位满");
-                            FAttention f = new FAttention("超大型吸嘴NG槽位满");
+                            hsl.WriteBool("M371", false);
+                            ShowLog("小型吸嘴NG槽位未取走");
+                            FAttention f = new FAttention("小型吸嘴NG槽位未取走");
                             f.ShowDialog();
                         }
-                        if (hsl.ReadBool("M361", 1)[0])
+                        if (hsl.ReadBool("M372", 1)[0])
                         {
-                            hsl.WriteBool("M361", false);
-                            ShowLog("超大型反光板NG槽位满");
-                            FAttention f = new FAttention("超大型反光板NG槽位满");
+                            hsl.WriteBool("M372", false);
+                            ShowLog("小型反光板NG槽位未取走");
+                            FAttention f = new FAttention("小型反光板NG槽位未取走");
+                            f.ShowDialog();
+                        }
+                        if (hsl.ReadBool("M373", 1)[0])
+                        {
+                            hsl.WriteBool("M373", false);
+                            ShowLog("小型破损NG槽位未取走");
+                            FAttention f = new FAttention("小型破损NG槽位未取走");
+                            f.ShowDialog();
+                        }
+
+                        if (hsl.ReadBool("M374", 1)[0])
+                        {
+                            hsl.WriteBool("M374", false);
+                            ShowLog("大型流通量NG槽位未取走");
+                            FAttention f = new FAttention("大型流通量NG槽位未取走");
+                            f.ShowDialog();
+                        }
+                        if (hsl.ReadBool("M375", 1)[0])
+                        {
+                            hsl.WriteBool("M375", false);
+                            ShowLog("大型吸嘴NG槽位未取走");
+                            FAttention f = new FAttention("大型吸嘴NG槽位未取走");
+                            f.ShowDialog();
+                        }
+                        if (hsl.ReadBool("M376", 1)[0])
+                        {
+                            hsl.WriteBool("M376", false);
+                            ShowLog("大型反光板NG槽位未取走");
+                            FAttention f = new FAttention("大型反光板NG槽位未取走");
+                            f.ShowDialog();
+                        }
+                        if (hsl.ReadBool("M377", 1)[0])
+                        {
+                            hsl.WriteBool("M377", false);
+                            ShowLog("大型破损NG槽位未取走");
+                            FAttention f = new FAttention("大型破损NG槽位未取走");
                             f.ShowDialog();
                         }
 
@@ -988,8 +1046,8 @@ namespace Panasonic_SmartClean
                                         ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance[vProcess[0].ProcessName+".图像源1"];
                                         ImageBaseData pic = tool.ModuResult.ImageData;
                                         Image img = ImageBaseDataToBitmap(pic);
-                                        wp.MouseBefore = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_1.jpg";
-                                        SaveImage(img, SoftConfig.ImagePath + "\\" + wp.MouseBefore);
+                                        wp.MouseBefore = SoftConfig.ImagePath + "\\" + IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_1.jpg";
+                                        SaveImage(img, wp.MouseBefore);
                                     }));
                                 });
                                 break;
@@ -1013,8 +1071,8 @@ namespace Panasonic_SmartClean
                                                 ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance[vProcess[0].ProcessName+".图像源1"];
                                                 ImageBaseData pic = tool.ModuResult.ImageData;
                                                 Image img = ImageBaseDataToBitmap(pic);
-                                                wp.MouseAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
-                                                SaveImage(img, SoftConfig.ImagePath + "\\" + wp.MouseAfter);
+                                                wp.MouseAfter = SoftConfig.ImagePath + "\\" + IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_3.jpg";
+                                                SaveImage(img, wp.MouseAfter);
 
                                             }));
                                         });
@@ -1055,8 +1113,8 @@ namespace Panasonic_SmartClean
                                         ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance[vProcess[0].ProcessName+".图像源1"];
                                         ImageBaseData pic = tool.ModuResult.ImageData;
                                         Image img = ImageBaseDataToBitmap(pic);
-                                        wp.BoardBefore = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_2.jpg";
-                                        SaveImage(img, SoftConfig.ImagePath + "\\" + wp.BoardBefore);
+                                        wp.BoardBefore = SoftConfig.ImagePath + "\\" + IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_2.jpg";
+                                        SaveImage(img,  wp.BoardBefore);
                                     }));
                                 });
                                 break;
@@ -1108,8 +1166,8 @@ namespace Panasonic_SmartClean
                                                     ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance[vProcess[0].ProcessName+".图像源1"];
                                                     ImageBaseData pic = tool.ModuResult.ImageData;
                                                     Image img = ImageBaseDataToBitmap(pic);
-                                                    wp.BoardAfter = IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_4.jpg";
-                                                    SaveImage(img, SoftConfig.ImagePath + "\\" + wp.BoardAfter);
+                                                    wp.BoardAfter = SoftConfig.ImagePath + "\\" + IndexOfTask + "_" + iIndex.ToString() + "_" + wp.BarCode + "_" + wp.Ocr + "_4.jpg";
+                                                    SaveImage(img,  wp.BoardAfter);
 
                                                     FlowResult.Text = FlowResultStr;
                                                     FlowResult.ForeColor = FlowResultStr == "OK" ? Color.Chartreuse : Color.Red;

@@ -6,6 +6,7 @@ using System.Data;
 using System.Data.Entity;
 using System.Data.Entity.Core.Objects;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -81,5 +82,56 @@ namespace Panasonic_SmartClean
             }
         }
 
+        private void btnExport_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog kk = new SaveFileDialog();
+            kk.Title = "保存EXECL文件";
+            kk.Filter = "EXECL文件(*.xls) |*.xls |所有文件(*.*) |*.*";
+            kk.FilterIndex = 1;
+            kk.FileName = DateTime.Now.ToString("yyyy-MM-dd");
+            if (kk.ShowDialog() == DialogResult.OK)
+            {
+                string FileName = kk.FileName;
+                if (File.Exists(FileName))
+                    File.Delete(FileName);
+                FileStream objFileStream;
+                StreamWriter objStreamWriter;
+                string strLine = "";
+                objFileStream = new FileStream(FileName, FileMode.OpenOrCreate, FileAccess.Write);
+                objStreamWriter = new StreamWriter(objFileStream, System.Text.Encoding.Unicode);
+
+                strLine = strLine + "任务号" + System.Convert.ToChar(9);
+                strLine = strLine + "序号" + System.Convert.ToChar(9);
+                strLine = strLine + "条码" + System.Convert.ToChar(9);
+                strLine = strLine + "OCR" + System.Convert.ToChar(9);
+                strLine = strLine + "时间" + System.Convert.ToChar(9);
+                strLine = strLine + "类别" + System.Convert.ToChar(9);
+                strLine = strLine + "吸嘴" + System.Convert.ToChar(9);
+                strLine = strLine + "反光板" + System.Convert.ToChar(9);
+                strLine = strLine + "流量" + System.Convert.ToChar(9);
+                strLine = strLine + "流量值" + System.Convert.ToChar(9);
+                objStreamWriter.WriteLine(strLine);
+                strLine = "";
+                for (int i = 0; i < dv.RowCount; i++)
+                {
+                    strLine = strLine + dv.Rows[i].Cells[0].Value?.ToString() + System.Convert.ToChar(9);
+                    strLine = strLine + dv.Rows[i].Cells[1].Value?.ToString() + System.Convert.ToChar(9);
+                    strLine = strLine + dv.Rows[i].Cells[2].Value?.ToString() + System.Convert.ToChar(9);
+                    strLine = strLine + dv.Rows[i].Cells[3].Value?.ToString() + System.Convert.ToChar(9);
+                    strLine = strLine + dv.Rows[i].Cells[4].Value?.ToString() + System.Convert.ToChar(9);
+                    strLine = strLine + dv.Rows[i].Cells[5].Value?.ToString() + System.Convert.ToChar(9);
+                    strLine = strLine + dv.Rows[i].Cells[6].Value?.ToString() + System.Convert.ToChar(9);
+                    strLine = strLine + dv.Rows[i].Cells[7].Value?.ToString() + System.Convert.ToChar(9);
+                    strLine = strLine + dv.Rows[i].Cells[8].Value?.ToString() + System.Convert.ToChar(9);
+                    strLine = strLine + dv.Rows[i].Cells[9].Value?.ToString() + System.Convert.ToChar(9);
+
+                    objStreamWriter.WriteLine(strLine);
+                    strLine = "";
+                }
+                objStreamWriter.Close();
+
+                MessageBox.Show(this, "导出EXCEL成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
     }
 }

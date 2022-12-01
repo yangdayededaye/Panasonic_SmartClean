@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.Entity;
 using System.Data.Entity.Core.Objects;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -19,7 +20,7 @@ namespace Panasonic_SmartClean
 #pragma warning restore CS0246 // 未能找到类型或命名空间名“UIForm”(是否缺少 using 指令或程序集引用?)
     {
         AutoSizeFormClass asc = new AutoSizeFormClass();
-
+        string _image1, _image2, _image3, _image4;
         public FLogInfo(string MouseResult,string BoardResult,string image1, string image2, string image3, string image4)
         {
             InitializeComponent();
@@ -30,6 +31,10 @@ namespace Panasonic_SmartClean
                 lbMouseResult.ForeColor = MouseResult == "OK" ? Color.Green : Color.Red;
                 lbBoardResult.Text = BoardResult;
                 lbBoardResult.ForeColor = BoardResult == "OK" ? Color.Green : Color.Red;
+                _image1 = image1;
+                _image2 = image2;
+                _image3 = image3;
+                _image4 = image4;
             }
             catch (Exception)
             {
@@ -38,7 +43,7 @@ namespace Panasonic_SmartClean
 
             try
             {
-                picMouseBefore.Image = Image.FromFile(SoftConfig.ImagePath + "\\" + image1);
+                picMouseBefore.Image = Image.FromFile(image1);
             }
             catch (Exception ex)
             {
@@ -46,7 +51,7 @@ namespace Panasonic_SmartClean
             }
             try
             {
-                picMouseAfter.Image = Image.FromFile(SoftConfig.ImagePath + "\\" + image3);
+                picMouseAfter.Image = Image.FromFile(image3);
             }
             catch (Exception ex)
             {
@@ -54,7 +59,7 @@ namespace Panasonic_SmartClean
             }
             try
             {
-                picBoardBefore.Image = Image.FromFile(SoftConfig.ImagePath + "\\" + image2);
+                picBoardBefore.Image = Image.FromFile(image2);
             }
             catch (Exception ex)
             {
@@ -62,7 +67,7 @@ namespace Panasonic_SmartClean
             }
             try
             {
-                picBoardAfter.Image = Image.FromFile(SoftConfig.ImagePath + "\\" + image4);
+                picBoardAfter.Image = Image.FromFile(image4);
             }
             catch (Exception ex)
             {
@@ -78,8 +83,54 @@ namespace Panasonic_SmartClean
             
         }
 
+        public void OpenImage(string FilePath,bool IsWait=true)
+        {
+            Process process = new Process();
+            ProcessStartInfo psi = new ProcessStartInfo(FilePath);
+            process.StartInfo = psi;
 
+            process.StartInfo.UseShellExecute = true;
 
-        
+            try
+            {
+                process.Start();
+
+                //等待打开的程序关闭
+                if (IsWait)
+                {
+                    process.WaitForExit();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                ShowWarningTip("图片不存在");
+            }
+            finally
+            {
+                process?.Close();
+
+            }
+        }
+
+        private void picMouseBefore_DoubleClick(object sender, EventArgs e)
+        {
+            OpenImage(_image1);
+        }
+
+        private void picMouseAfter_DoubleClick(object sender, EventArgs e)
+        {
+            OpenImage(_image2);
+        }
+
+        private void picBoardBefore_DoubleClick(object sender, EventArgs e)
+        {
+            OpenImage(_image3);
+        }
+
+        private void picBoardAfter_DoubleClick(object sender, EventArgs e)
+        {
+            OpenImage(_image4);
+        }
     }
 }

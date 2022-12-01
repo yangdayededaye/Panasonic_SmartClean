@@ -274,8 +274,16 @@ namespace Panasonic_SmartClean.Service
 
                 try
                 {
-                    OperateResult<UInt16[]> b = melsec_net.ReadUInt16("D5022", 1);
-                    _connected = true;
+                    bool[] b = ReadBool("M9", 1);
+                    if (b==null)
+                    {
+                        _connected = false;
+                    }
+                    else
+                    {
+                        _connected = true;
+                    }
+                    
                 }
                 catch (Exception ex)
                 {
