@@ -73,8 +73,11 @@ namespace Panasonic_SmartClean
                     if (lstControl.Count() > 0)
                     {
                         UILedBulb ub = (UILedBulb)lstControl[0];
-                        ub.On = b[i];
-                    }
+                        if (b[i])
+                            ub.Color = System.Drawing.Color.LawnGreen;
+                        else
+                            ub.Color = System.Drawing.Color.DarkGray;
+                      }
                 }
             }
             catch (Exception)
