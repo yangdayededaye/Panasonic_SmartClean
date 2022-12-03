@@ -48,7 +48,7 @@ namespace Panasonic_SmartClean
 
         private void dv_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (dv.Columns[e.ColumnIndex].Name == "delete" && e.RowIndex >= 0)
+            if (e.ColumnIndex>=0&&dv.Columns[e.ColumnIndex].Name == "delete" && e.RowIndex >= 0)
             {
                 if (ShowAskDialog("确认删除吗？", false))
                 {
