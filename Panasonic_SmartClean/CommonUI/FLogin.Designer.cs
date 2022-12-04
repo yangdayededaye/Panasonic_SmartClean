@@ -40,6 +40,7 @@
             this.lbTitle = new Sunny.UI.UILabel();
             this.pLogin = new System.Windows.Forms.Panel();
             this.UserLogin = new Sunny.UI.UIHeaderButton();
+            this.uiLabel3 = new Sunny.UI.UILabel();
             this.pLogin.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -188,6 +189,7 @@
             // 
             // pLogin
             // 
+            this.pLogin.Controls.Add(this.uiLabel3);
             this.pLogin.Controls.Add(this.UserLogin);
             this.pLogin.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pLogin.Location = new System.Drawing.Point(0, 0);
@@ -220,6 +222,19 @@
             this.UserLogin.TipsFont = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.UserLogin.ZoomScaleRect = new System.Drawing.Rectangle(0, 0, 0, 0);
             this.UserLogin.Click += new System.EventHandler(this.UserLogin_Click);
+            // 
+            // uiLabel3
+            // 
+            this.uiLabel3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.uiLabel3.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.uiLabel3.Location = new System.Drawing.Point(7, 542);
+            this.uiLabel3.Name = "uiLabel3";
+            this.uiLabel3.Size = new System.Drawing.Size(128, 35);
+            this.uiLabel3.Style = Sunny.UI.UIStyle.Custom;
+            this.uiLabel3.TabIndex = 88;
+            this.uiLabel3.Text = "V1.0.0";
+            this.uiLabel3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.uiLabel3.ZoomScaleRect = new System.Drawing.Rectangle(0, 0, 0, 0);
             // 
             // FLogin
             // 
@@ -284,6 +299,7 @@
         private System.Windows.Forms.Panel pLogin;
 #pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UIHeaderButton”(是否缺少程序集引用?)
         private Sunny.UI.UIHeaderButton UserLogin;
+        private Sunny.UI.UILabel uiLabel3;
 #pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UIHeaderButton”(是否缺少程序集引用?)
     }
 }

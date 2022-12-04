@@ -304,27 +304,27 @@ namespace Panasonic_SmartClean
                             FAttention f = new FAttention("大型吸嘴反光板破损NG槽位满");
                             f.ShowDialog();
                         }
-                        //if (hsl.ReadBool("M359", 1)[0])
-                        //{
-                        //    hsl.WriteBool("M359", false);
-                        //    ShowLog("超大型通透检测NG槽位满");
-                        //    FAttention f = new FAttention("超大型通透检测NG槽位满");
-                        //    f.ShowDialog();
-                        //}
-                        //if (hsl.ReadBool("M360", 1)[0])
-                        //{
-                        //    hsl.WriteBool("M360", false);
-                        //    ShowLog("超大型吸嘴NG槽位满");
-                        //    FAttention f = new FAttention("超大型吸嘴NG槽位满");
-                        //    f.ShowDialog();
-                        //}
-                        //if (hsl.ReadBool("M361", 1)[0])
-                        //{
-                        //    hsl.WriteBool("M361", false);
-                        //    ShowLog("超大型反光板NG槽位满");
-                        //    FAttention f = new FAttention("超大型反光板NG槽位满");
-                        //    f.ShowDialog();
-                        //}
+                        if (hsl.ReadBool("M359", 1)[0])
+                        {
+                            hsl.WriteBool("M359", false);
+                            ShowLog("超大型通透检测NG槽位满");
+                            FAttention f = new FAttention("超大型通透检测NG槽位满");
+                            f.ShowDialog();
+                        }
+                        if (hsl.ReadBool("M360", 1)[0])
+                        {
+                            hsl.WriteBool("M360", false);
+                            ShowLog("超大型吸嘴NG槽位满");
+                            FAttention f = new FAttention("超大型吸嘴NG槽位满");
+                            f.ShowDialog();
+                        }
+                        if (hsl.ReadBool("M361", 1)[0])
+                        {
+                            hsl.WriteBool("M361", false);
+                            ShowLog("超大型反光板NG槽位满");
+                            FAttention f = new FAttention("超大型反光板NG槽位满");
+                            f.ShowDialog();
+                        }
 
                         if (hsl.ReadBool("M370", 1)[0])
                         {

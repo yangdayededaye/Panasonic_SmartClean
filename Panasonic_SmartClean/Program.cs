@@ -23,14 +23,15 @@ namespace Panasonic_SmartClean
                 {
                     Application.EnableVisualStyles();
                     Application.SetCompatibleTextRenderingDefault(false);
-                    if (ConfigurationManager.AppSettings["NeedLogin"].ToString() == "1")
-                    {
-                        Application.Run(new FLogin());
-                    }
-                    else
-                    {
-                        Application.Run(new FMain_DeviceNew());
-                    }
+                    Application.Run(new FLogin());
+                    //if (ConfigurationManager.AppSettings["NeedLogin"].ToString() == "1")
+                    //{
+                    //    Application.Run(new FLogin());
+                    //}
+                    //else
+                    //{
+                    //    Application.Run(new FMain_DeviceNew());
+                    //}
                     
                 }
                 // 程序已经运行的情况，则弹出消息提示并终止此次运行

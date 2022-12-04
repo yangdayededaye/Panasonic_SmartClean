@@ -49,28 +49,28 @@ namespace Panasonic_SmartClean
         private void uiTxtPsw_Click(object sender, EventArgs e)
         {
 
-            using (FKeyBoardNum f=new FKeyBoardNum("请输入密码"))
-            {
-                if (f.ShowDialog() == DialogResult.Yes)
-                {
-                    uiTxtPsw.Text = f.output;
-                }
-                else
-                    uiTxtPsw.Text = "";
-            }
+            //using (FKeyBoardNum f=new FKeyBoardNum("请输入密码"))
+            //{
+            //    if (f.ShowDialog() == DialogResult.Yes)
+            //    {
+            //        uiTxtPsw.Text = f.output;
+            //    }
+            //    else
+            //        uiTxtPsw.Text = "";
+            //}
         }
 
         private void uiTxtUserNo_Click(object sender, EventArgs e)
         {
-            using (FKeyBoardNum f = new FKeyBoardNum("请输入账号"))
-            {
-                if (f.ShowDialog() == DialogResult.Yes)
-                {
-                    uiTxtUserNo.Text = f.output;
-                }
-                else
-                    uiTxtUserNo.Text = "";
-            }
+            //using (FKeyBoardNum f = new FKeyBoardNum("请输入账号"))
+            //{
+            //    if (f.ShowDialog() == DialogResult.Yes)
+            //    {
+            //        uiTxtUserNo.Text = f.output;
+            //    }
+            //    else
+            //        uiTxtUserNo.Text = "";
+            //}
         }
 
         private void btnLogin_Click(object sender, EventArgs e)

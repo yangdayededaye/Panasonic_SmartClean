@@ -4,90 +4,90 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="Panasonic_SmartCleanModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <EntityType Name="CleanLog">
-          <Key>
-            <PropertyRef Name="LogIndex" />
-          </Key>
-          <Property Name="LogIndex" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="CabNo" Type="int" />
-          <Property Name="TaskIndex" Type="varchar" MaxLength="50" />
-          <Property Name="LogTime" Type="datetime" />
-          <Property Name="WorkPieceIndex" Type="int" />
-          <Property Name="Exist" Type="char" MaxLength="1" />
-          <Property Name="BarCode" Type="varchar" MaxLength="50" />
-          <Property Name="Ocr" Type="varchar" MaxLength="50" />
-          <Property Name="Type" Type="varchar" MaxLength="50" />
-          <Property Name="MouseResult" Type="varchar" MaxLength="50" />
-          <Property Name="ReflectPanelResult" Type="varchar" MaxLength="50" />
-          <Property Name="FlowResult" Type="varchar" MaxLength="50" />
-          <Property Name="FlowCount" Type="int" />
-          <Property Name="MouseBefore" Type="varchar" MaxLength="100" />
-          <Property Name="MouseAfter" Type="varchar" MaxLength="100" />
-          <Property Name="BoardBefore" Type="varchar" MaxLength="100" />
-          <Property Name="BoardAfter" Type="varchar" MaxLength="100" />
-          <Property Name="Operator" Type="varchar" MaxLength="50" />
-        </EntityType>
-        <EntityType Name="Flow">
-          <Key>
-            <PropertyRef Name="ThresholdIndex" />
-          </Key>
-          <Property Name="ThresholdIndex" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Ocr" Type="varchar" MaxLength="50" />
-          <Property Name="Value" Type="int" />
-        </EntityType>
-        <EntityType Name="Log">
-          <Key>
-            <PropertyRef Name="ID" />
-          </Key>
-          <Property Name="ID" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="LogTime" Type="datetime" />
-          <Property Name="LogObject" Type="varchar" MaxLength="50" />
-          <Property Name="LogType" Type="varchar" MaxLength="50" />
-          <Property Name="Info" Type="text" />
-          <Property Name="State" Type="char" MaxLength="1" />
-        </EntityType>
-        <EntityType Name="User">
-          <Key>
-            <PropertyRef Name="ID" />
-          </Key>
-          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="UserCode" Type="varchar" MaxLength="50" />
-          <Property Name="UserName" Type="varchar" MaxLength="50" />
-          <Property Name="UserPY" Type="varchar" MaxLength="50" />
-          <Property Name="UserPsw" Type="varchar" MaxLength="50" />
-          <Property Name="UserSex" Type="varchar" MaxLength="50" />
-          <Property Name="UserType" Type="varchar" MaxLength="50" />
-          <Property Name="State" Type="char" MaxLength="1" />
-        </EntityType>
-        <EntityType Name="VisonProcess">
-          <Key>
-            <PropertyRef Name="ProcessIndex" />
-          </Key>
-          <Property Name="ProcessIndex" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="ProcessID" Type="varchar" MaxLength="50" />
-          <Property Name="ProcessName" Type="varchar" MaxLength="100" />
-          <Property Name="Type" Type="varchar" MaxLength="50" />
-          <Property Name="Remark" Type="varchar" MaxLength="255" />
-        </EntityType>
-        <EntityType Name="Warn">
-          <Key>
-            <PropertyRef Name="WarnIndex" />
-          </Key>
-          <Property Name="WarnIndex" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="WarnTime" Type="datetime" />
-          <Property Name="Context" Type="varchar" MaxLength="255" />
-          <Property Name="State" Type="char" MaxLength="1" />
-        </EntityType>
-        <EntityContainer Name="Panasonic_SmartCleanModelStoreContainer">
-          <EntitySet Name="CleanLog" EntityType="Self.CleanLog" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Flow" EntityType="Self.Flow" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Log" EntityType="Self.Log" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="User" EntityType="Self.User" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="VisonProcess" EntityType="Self.VisonProcess" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Warn" EntityType="Self.Warn" Schema="dbo" store:Type="Tables" />
-        </EntityContainer>
-      </Schema></edmx:StorageModels>
+    <Schema Namespace="Panasonic_SmartCleanModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityContainer Name="Panasonic_SmartCleanModelStoreContainer">
+    <EntitySet Name="CleanLog" EntityType="Panasonic_SmartCleanModel.Store.CleanLog" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Flow" EntityType="Panasonic_SmartCleanModel.Store.Flow" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Log" EntityType="Panasonic_SmartCleanModel.Store.Log" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="User" EntityType="Panasonic_SmartCleanModel.Store.User" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="VisonProcess" EntityType="Panasonic_SmartCleanModel.Store.VisonProcess" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Warn" EntityType="Panasonic_SmartCleanModel.Store.Warn" store:Type="Tables" Schema="dbo" />
+  </EntityContainer>
+  <EntityType Name="CleanLog">
+    <Key>
+      <PropertyRef Name="LogIndex" />
+    </Key>
+    <Property Name="LogIndex" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="CabNo" Type="int" Nullable="true" />
+    <Property Name="TaskIndex" Type="varchar" Nullable="true" MaxLength="50" />
+    <Property Name="LogTime" Type="datetime" Nullable="true" />
+    <Property Name="WorkPieceIndex" Type="int" Nullable="true" />
+    <Property Name="Exist" Type="char" Nullable="true" MaxLength="1" />
+    <Property Name="BarCode" Type="varchar" Nullable="true" MaxLength="50" />
+    <Property Name="Ocr" Type="varchar" Nullable="true" MaxLength="50" />
+    <Property Name="Type" Type="varchar" Nullable="true" MaxLength="50" />
+    <Property Name="MouseResult" Type="varchar" Nullable="true" MaxLength="50" />
+    <Property Name="ReflectPanelResult" Type="varchar" Nullable="true" MaxLength="50" />
+    <Property Name="FlowResult" Type="varchar" Nullable="true" MaxLength="50" />
+    <Property Name="FlowCount" Type="int" Nullable="true" />
+    <Property Name="MouseBefore" Type="varchar" Nullable="true" MaxLength="100" />
+    <Property Name="MouseAfter" Type="varchar" Nullable="true" MaxLength="100" />
+    <Property Name="BoardBefore" Type="varchar" Nullable="true" MaxLength="100" />
+    <Property Name="BoardAfter" Type="varchar" Nullable="true" MaxLength="100" />
+    <Property Name="Operator" Type="varchar" Nullable="true" MaxLength="50" />
+  </EntityType>
+  <EntityType Name="Flow">
+    <Key>
+      <PropertyRef Name="ThresholdIndex" />
+    </Key>
+    <Property Name="ThresholdIndex" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Ocr" Type="varchar" Nullable="true" MaxLength="50" />
+    <Property Name="Value" Type="int" Nullable="true" />
+  </EntityType>
+  <EntityType Name="Log">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="LogTime" Type="datetime" Nullable="true" />
+    <Property Name="LogObject" Type="varchar" Nullable="true" MaxLength="50" />
+    <Property Name="LogType" Type="varchar" Nullable="true" MaxLength="50" />
+    <Property Name="Info" Type="varchar(max)" Nullable="true" />
+    <Property Name="State" Type="char" Nullable="true" MaxLength="1" />
+  </EntityType>
+  <EntityType Name="User">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="UserCode" Type="varchar" Nullable="true" MaxLength="50" />
+    <Property Name="UserName" Type="varchar" Nullable="true" MaxLength="50" />
+    <Property Name="UserPY" Type="varchar" Nullable="true" MaxLength="50" />
+    <Property Name="UserPsw" Type="varchar" Nullable="true" MaxLength="50" />
+    <Property Name="UserSex" Type="varchar" Nullable="true" MaxLength="50" />
+    <Property Name="UserType" Type="varchar" Nullable="true" MaxLength="50" />
+    <Property Name="State" Type="char" Nullable="true" MaxLength="1" />
+  </EntityType>
+  <EntityType Name="VisonProcess">
+    <Key>
+      <PropertyRef Name="ProcessIndex" />
+    </Key>
+    <Property Name="ProcessIndex" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ProcessID" Type="varchar" Nullable="true" MaxLength="50" />
+    <Property Name="ProcessName" Type="varchar" Nullable="true" MaxLength="100" />
+    <Property Name="Type" Type="varchar" Nullable="true" MaxLength="50" />
+    <Property Name="Remark" Type="varchar" Nullable="true" MaxLength="255" />
+  </EntityType>
+  <EntityType Name="Warn">
+    <Key>
+      <PropertyRef Name="WarnIndex" />
+    </Key>
+    <Property Name="WarnIndex" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="WarnTime" Type="datetime" Nullable="true" />
+    <Property Name="Context" Type="varchar" Nullable="true" MaxLength="255" />
+    <Property Name="State" Type="char" Nullable="true" MaxLength="1" />
+  </EntityType>
+</Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="Panasonic_SmartCleanModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -177,91 +177,90 @@
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
-      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="Panasonic_SmartCleanModelStoreContainer" CdmEntityContainer="Panasonic_SmartCleanEntities">
-          <EntitySetMapping Name="CleanLog">
-            <EntityTypeMapping TypeName="Panasonic_SmartCleanModel.CleanLog">
-              <MappingFragment StoreEntitySet="CleanLog">
-                <ScalarProperty Name="Operator" ColumnName="Operator" />
-                <ScalarProperty Name="BoardAfter" ColumnName="BoardAfter" />
-                <ScalarProperty Name="BoardBefore" ColumnName="BoardBefore" />
-                <ScalarProperty Name="MouseAfter" ColumnName="MouseAfter" />
-                <ScalarProperty Name="MouseBefore" ColumnName="MouseBefore" />
-                <ScalarProperty Name="FlowCount" ColumnName="FlowCount" />
-                <ScalarProperty Name="FlowResult" ColumnName="FlowResult" />
-                <ScalarProperty Name="ReflectPanelResult" ColumnName="ReflectPanelResult" />
-                <ScalarProperty Name="MouseResult" ColumnName="MouseResult" />
-                <ScalarProperty Name="Type" ColumnName="Type" />
-                <ScalarProperty Name="Ocr" ColumnName="Ocr" />
-                <ScalarProperty Name="BarCode" ColumnName="BarCode" />
-                <ScalarProperty Name="Exist" ColumnName="Exist" />
-                <ScalarProperty Name="WorkPieceIndex" ColumnName="WorkPieceIndex" />
-                <ScalarProperty Name="LogTime" ColumnName="LogTime" />
-                <ScalarProperty Name="TaskIndex" ColumnName="TaskIndex" />
-                <ScalarProperty Name="CabNo" ColumnName="CabNo" />
-                <ScalarProperty Name="LogIndex" ColumnName="LogIndex" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Flow">
-            <EntityTypeMapping TypeName="Panasonic_SmartCleanModel.Flow">
-              <MappingFragment StoreEntitySet="Flow">
-                <ScalarProperty Name="Value" ColumnName="Value" />
-                <ScalarProperty Name="Ocr" ColumnName="Ocr" />
-                <ScalarProperty Name="ThresholdIndex" ColumnName="ThresholdIndex" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Log">
-            <EntityTypeMapping TypeName="Panasonic_SmartCleanModel.Log">
-              <MappingFragment StoreEntitySet="Log">
-                <ScalarProperty Name="State" ColumnName="State" />
-                <ScalarProperty Name="Info" ColumnName="Info" />
-                <ScalarProperty Name="LogType" ColumnName="LogType" />
-                <ScalarProperty Name="LogObject" ColumnName="LogObject" />
-                <ScalarProperty Name="LogTime" ColumnName="LogTime" />
-                <ScalarProperty Name="ID" ColumnName="ID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="User">
-            <EntityTypeMapping TypeName="Panasonic_SmartCleanModel.User">
-              <MappingFragment StoreEntitySet="User">
-                <ScalarProperty Name="State" ColumnName="State" />
-                <ScalarProperty Name="UserType" ColumnName="UserType" />
-                <ScalarProperty Name="UserSex" ColumnName="UserSex" />
-                <ScalarProperty Name="UserPsw" ColumnName="UserPsw" />
-                <ScalarProperty Name="UserPY" ColumnName="UserPY" />
-                <ScalarProperty Name="UserName" ColumnName="UserName" />
-                <ScalarProperty Name="UserCode" ColumnName="UserCode" />
-                <ScalarProperty Name="ID" ColumnName="ID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="VisonProcess">
-            <EntityTypeMapping TypeName="Panasonic_SmartCleanModel.VisonProcess">
-              <MappingFragment StoreEntitySet="VisonProcess">
-                <ScalarProperty Name="Remark" ColumnName="Remark" />
-                <ScalarProperty Name="Type" ColumnName="Type" />
-                <ScalarProperty Name="ProcessName" ColumnName="ProcessName" />
-                <ScalarProperty Name="ProcessID" ColumnName="ProcessID" />
-                <ScalarProperty Name="ProcessIndex" ColumnName="ProcessIndex" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Warn">
-            <EntityTypeMapping TypeName="Panasonic_SmartCleanModel.Warn">
-              <MappingFragment StoreEntitySet="Warn">
-                <ScalarProperty Name="State" ColumnName="State" />
-                <ScalarProperty Name="Context" ColumnName="Context" />
-                <ScalarProperty Name="WarnTime" ColumnName="WarnTime" />
-                <ScalarProperty Name="WarnIndex" ColumnName="WarnIndex" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-        </EntityContainerMapping>
-      </Mapping>
-    </edmx:Mappings>
+    <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="Panasonic_SmartCleanModelStoreContainer" CdmEntityContainer="Panasonic_SmartCleanEntities">
+    <EntitySetMapping Name="CleanLog">
+      <EntityTypeMapping TypeName="IsTypeOf(Panasonic_SmartCleanModel.CleanLog)">
+        <MappingFragment StoreEntitySet="CleanLog">
+          <ScalarProperty Name="LogIndex" ColumnName="LogIndex" />
+          <ScalarProperty Name="CabNo" ColumnName="CabNo" />
+          <ScalarProperty Name="TaskIndex" ColumnName="TaskIndex" />
+          <ScalarProperty Name="LogTime" ColumnName="LogTime" />
+          <ScalarProperty Name="WorkPieceIndex" ColumnName="WorkPieceIndex" />
+          <ScalarProperty Name="Exist" ColumnName="Exist" />
+          <ScalarProperty Name="BarCode" ColumnName="BarCode" />
+          <ScalarProperty Name="Ocr" ColumnName="Ocr" />
+          <ScalarProperty Name="Type" ColumnName="Type" />
+          <ScalarProperty Name="MouseResult" ColumnName="MouseResult" />
+          <ScalarProperty Name="ReflectPanelResult" ColumnName="ReflectPanelResult" />
+          <ScalarProperty Name="FlowResult" ColumnName="FlowResult" />
+          <ScalarProperty Name="FlowCount" ColumnName="FlowCount" />
+          <ScalarProperty Name="MouseBefore" ColumnName="MouseBefore" />
+          <ScalarProperty Name="MouseAfter" ColumnName="MouseAfter" />
+          <ScalarProperty Name="BoardBefore" ColumnName="BoardBefore" />
+          <ScalarProperty Name="BoardAfter" ColumnName="BoardAfter" />
+          <ScalarProperty Name="Operator" ColumnName="Operator" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Flow">
+      <EntityTypeMapping TypeName="IsTypeOf(Panasonic_SmartCleanModel.Flow)">
+        <MappingFragment StoreEntitySet="Flow">
+          <ScalarProperty Name="ThresholdIndex" ColumnName="ThresholdIndex" />
+          <ScalarProperty Name="Ocr" ColumnName="Ocr" />
+          <ScalarProperty Name="Value" ColumnName="Value" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Log">
+      <EntityTypeMapping TypeName="IsTypeOf(Panasonic_SmartCleanModel.Log)">
+        <MappingFragment StoreEntitySet="Log">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="LogTime" ColumnName="LogTime" />
+          <ScalarProperty Name="LogObject" ColumnName="LogObject" />
+          <ScalarProperty Name="LogType" ColumnName="LogType" />
+          <ScalarProperty Name="Info" ColumnName="Info" />
+          <ScalarProperty Name="State" ColumnName="State" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="User">
+      <EntityTypeMapping TypeName="IsTypeOf(Panasonic_SmartCleanModel.User)">
+        <MappingFragment StoreEntitySet="User">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="UserCode" ColumnName="UserCode" />
+          <ScalarProperty Name="UserName" ColumnName="UserName" />
+          <ScalarProperty Name="UserPY" ColumnName="UserPY" />
+          <ScalarProperty Name="UserPsw" ColumnName="UserPsw" />
+          <ScalarProperty Name="UserSex" ColumnName="UserSex" />
+          <ScalarProperty Name="UserType" ColumnName="UserType" />
+          <ScalarProperty Name="State" ColumnName="State" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="VisonProcess">
+      <EntityTypeMapping TypeName="IsTypeOf(Panasonic_SmartCleanModel.VisonProcess)">
+        <MappingFragment StoreEntitySet="VisonProcess">
+          <ScalarProperty Name="ProcessIndex" ColumnName="ProcessIndex" />
+          <ScalarProperty Name="ProcessID" ColumnName="ProcessID" />
+          <ScalarProperty Name="ProcessName" ColumnName="ProcessName" />
+          <ScalarProperty Name="Type" ColumnName="Type" />
+          <ScalarProperty Name="Remark" ColumnName="Remark" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Warn">
+      <EntityTypeMapping TypeName="IsTypeOf(Panasonic_SmartCleanModel.Warn)">
+        <MappingFragment StoreEntitySet="Warn">
+          <ScalarProperty Name="WarnIndex" ColumnName="WarnIndex" />
+          <ScalarProperty Name="WarnTime" ColumnName="WarnTime" />
+          <ScalarProperty Name="Context" ColumnName="Context" />
+          <ScalarProperty Name="State" ColumnName="State" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping></edmx:Mappings>
   </edmx:Runtime>
   <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
   <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
@@ -275,7 +274,7 @@
         <DesignerProperty Name="ValidateOnBuild" Value="true" />
         <DesignerProperty Name="EnablePluralization" Value="false" />
         <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
-        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="UseLegacyProvider" Value="False" />
         <DesignerProperty Name="CodeGenerationStrategy" Value="无" />
       </DesignerInfoPropertySet>
     </Options>
