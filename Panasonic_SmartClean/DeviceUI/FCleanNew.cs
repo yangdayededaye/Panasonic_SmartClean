@@ -383,7 +383,27 @@ namespace Panasonic_SmartClean
                             FAttention f = new FAttention("大型破损NG槽位未取走");
                             f.ShowDialog();
                         }
-
+                        if (hsl.ReadBool("M378", 1)[0])
+                        {
+                            hsl.WriteBool("M378", false);
+                            ShowLog("超大型流通量NG工位料未取走");
+                            FAttention f = new FAttention("超大型流通量NG工位料未取走");
+                            f.ShowDialog();
+                        }
+                        if (hsl.ReadBool("M379", 1)[0])
+                        {
+                            hsl.WriteBool("M379", false);
+                            ShowLog("超大型吸嘴NG工位料未取走");
+                            FAttention f = new FAttention("超大型吸嘴NG工位料未取走");
+                            f.ShowDialog();
+                        }
+                        if (hsl.ReadBool("M380", 1)[0])
+                        {
+                            hsl.WriteBool("M380", false);
+                            ShowLog("超大型反光板NG工位料未取走");
+                            FAttention f = new FAttention("超大型反光板NG工位料未取走");
+                            f.ShowDialog();
+                        }
                         //复位
                         if (hsl.ReadBool("M55", 1)[0])
                         {

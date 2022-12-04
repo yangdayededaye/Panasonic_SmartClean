@@ -47,6 +47,7 @@ namespace Panasonic_SmartClean
                     u.Name = "l"+SoftConfig._OMap[iCount-1].index.ToString();
                     u.Size = new Size(iWidth/2,iHeight/2);
                     u.Location = new Point(j * (iWidth + 5) + 35 + iWidth / 4, i * (iHeight + 15) + 30 + iHeight / 3);
+                    u.Color = System.Drawing.Color.DarkGray;
 
                     Label b = new Label();
                     b.Name = "b"+ SoftConfig._OMap[iCount - 1].index.ToString();
@@ -73,7 +74,10 @@ namespace Panasonic_SmartClean
                     if (lstControl.Count() > 0)
                     {
                         UILedBulb ub = (UILedBulb)lstControl[0];
-                        ub.On = b[i];
+                        if (b[i])
+                            ub.Color = System.Drawing.Color.LawnGreen;
+                        else
+                            ub.Color = System.Drawing.Color.DarkGray;
                     }
                 }
             }
