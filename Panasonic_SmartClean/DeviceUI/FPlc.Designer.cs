@@ -122,6 +122,9 @@
             this.uiLine10 = new Sunny.UI.UILine();
             this.uiLine11 = new Sunny.UI.UILine();
             this.tabControl = new Sunny.UI.UITabControl();
+            this.uiLine12 = new Sunny.UI.UILine();
+            this.button32 = new System.Windows.Forms.Button();
+            this.button35 = new System.Windows.Forms.Button();
             this.tabPage2.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -725,6 +728,9 @@
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.uiLine12);
+            this.groupBox4.Controls.Add(this.button32);
+            this.groupBox4.Controls.Add(this.button35);
             this.groupBox4.Controls.Add(this.uiLine8);
             this.groupBox4.Controls.Add(this.button23);
             this.groupBox4.Controls.Add(this.button24);
@@ -1416,13 +1422,51 @@
             this.tabControl.ZoomScaleRect = new System.Drawing.Rectangle(0, 0, 0, 0);
             this.tabControl.SelectedIndexChanged += new System.EventHandler(this.tabControl_SelectedIndexChanged);
             // 
+            // uiLine12
+            // 
+            this.uiLine12.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.uiLine12.Location = new System.Drawing.Point(518, 276);
+            this.uiLine12.MinimumSize = new System.Drawing.Size(1, 1);
+            this.uiLine12.Name = "uiLine12";
+            this.uiLine12.Size = new System.Drawing.Size(229, 29);
+            this.uiLine12.Style = Sunny.UI.UIStyle.Custom;
+            this.uiLine12.TabIndex = 170;
+            this.uiLine12.Text = "超大吸嘴夹爪升降气缸";
+            this.uiLine12.ZoomScaleRect = new System.Drawing.Rectangle(0, 0, 0, 0);
+            // 
+            // button32
+            // 
+            this.button32.ForeColor = System.Drawing.Color.Blue;
+            this.button32.Location = new System.Drawing.Point(518, 313);
+            this.button32.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.button32.Name = "button32";
+            this.button32.Size = new System.Drawing.Size(84, 45);
+            this.button32.TabIndex = 168;
+            this.button32.Tag = "1";
+            this.button32.Text = "上升";
+            this.button32.UseVisualStyleBackColor = true;
+            this.button32.Click += new System.EventHandler(this.button32_Click);
+            // 
+            // button35
+            // 
+            this.button35.ForeColor = System.Drawing.Color.Blue;
+            this.button35.Location = new System.Drawing.Point(663, 313);
+            this.button35.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.button35.Name = "button35";
+            this.button35.Size = new System.Drawing.Size(84, 45);
+            this.button35.TabIndex = 169;
+            this.button35.Tag = "2";
+            this.button35.Text = "下降";
+            this.button35.UseVisualStyleBackColor = true;
+            this.button35.Click += new System.EventHandler(this.button35_Click);
+            // 
             // FPlc
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(1009, 670);
             this.Controls.Add(this.tabControl);
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(1440, 900);
+            this.MaximumSize = new System.Drawing.Size(1920, 1080);
             this.MinimizeBox = false;
             this.Name = "FPlc";
             this.RectColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(76)))), ((int)(((byte)(76)))));
@@ -1617,5 +1661,8 @@
 #pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UITabControl”(是否缺少程序集引用?)
         private System.Windows.Forms.Button button30;
         private System.Windows.Forms.Button button29;
+        private Sunny.UI.UILine uiLine12;
+        private System.Windows.Forms.Button button32;
+        private System.Windows.Forms.Button button35;
     }
 }

@@ -90,6 +90,8 @@ namespace Panasonic_SmartClean.Service
         public string z_minu = "M433";
         public string z_posi = "M434";//M450
         public string z_posi_value = "D2150";
+        public string z_up = "M132";
+        public string z_down = "M133";
         //位置行数
         public string locationX1 = "D3100";
         public string locationX2 = "D3101";

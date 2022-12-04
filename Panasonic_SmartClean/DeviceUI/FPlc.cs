@@ -663,5 +663,19 @@ namespace Panasonic_SmartClean
         {
             hsl.WriteBool(hsl.z_minu, false);
         }
+
+        private void button32_Click(object sender, EventArgs e)
+        {
+            hsl.WriteBool(hsl.z_up, true);
+            Thread.Sleep(200);
+            hsl.WriteBool(hsl.z_up, false);
+        }
+
+        private void button35_Click(object sender, EventArgs e)
+        {
+            hsl.WriteBool(hsl.z_down, true);
+            Thread.Sleep(200);
+            hsl.WriteBool(hsl.z_down, false);
+        }
     }
 }
