@@ -85,7 +85,7 @@ namespace Panasonic_SmartClean
                     var vSmall = SoftConfig.db.VisonProcess.Where(x => x.Type == "小型").ToList();
                     var vBig = SoftConfig.db.VisonProcess.Where(x => x.Type == "大型").ToList();
                     var vSuperBig = SoftConfig.db.VisonProcess.Where(x => x.Type == "超大型").ToList();
-                    if ((vSmall != null && vSmall.Count > 0) &&(vBig != null && vBig.Count > 0)&& (vSuperBig != null && vSuperBig.Count > 0))
+                    if ((vSmall != null && vSmall.Count > 0) &&(vBig != null && vBig.Count > 0) && (vSuperBig != null && vSuperBig.Count > 0))
                     {
                         //设置图像源 调用拍照流程
                         ImageSourceModuleTool imageSourceToolBig = (ImageSourceModuleTool)VmSolution.Instance[vBig[0].ProcessName+".图像源1"];

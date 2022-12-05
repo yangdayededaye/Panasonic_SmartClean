@@ -871,7 +871,7 @@ namespace Panasonic_SmartClean
                     //2行3列
                     case EWorkPieceType.superbig:
                         BoxWidth = iWidth / 2 - 5;
-                        BoxHeight = iHeight / 3 - 5;
+                        BoxHeight = iHeight / 4 - 5;
                         iIndex = 1;
                         for (int i = 0; i < 2; i++)
                         {
@@ -1226,7 +1226,15 @@ namespace Panasonic_SmartClean
                                                 SoftConfig.lstWorkPiece[iWorkPieceIndex].FlowResult = FlowResultStr;
                                                 SoftConfig.lstWorkPiece[iWorkPieceIndex].FlowCount = FlowCountStr;
                                                 //流量结果给plc
-                                                hsl.WriteUshort("D5002", FlowCountStr > iThresholdValue ? (ushort)1 : (ushort)2);
+                                                if (CurrentType == EWorkPieceType.superbig)
+                                                {
+                                                    hsl.WriteUshort("D5012", FlowCountStr > iThresholdValue ? (ushort)1 : (ushort)2);
+                                                }
+                                                else
+                                                {
+                                                    hsl.WriteUshort("D5002", FlowCountStr > iThresholdValue ? (ushort)1 : (ushort)2);
+                                                }
+                                                
                                                 Invoke(new Action(() =>
                                                 {
                                                     ImageSourceModuleTool tool = (ImageSourceModuleTool)VmSolution.Instance[vProcess[0].ProcessName+".图像源1"];
@@ -1276,8 +1284,8 @@ namespace Panasonic_SmartClean
                         }
                     }
                 }
-
-
+                //回调后刷新示意图
+                CmdNeedRefresh.Enqueue("refresh");
             }
             catch (VmException ex)
             {
@@ -1287,6 +1295,7 @@ namespace Panasonic_SmartClean
             {
                 ShowLog("获取结果失败：" + Convert.ToString(ex.Message), 1);
             }
+          
 
             #region 注释不用
             //try
@@ -4445,13 +4454,14 @@ namespace Panasonic_SmartClean
                     {
                         hsl.WriteInt(hsl.locationX1, 1);
                         hsl.WriteInt(hsl.locationY1, 1);
+                        ShowLog("写PLC工件1数据1:" + hsl.locationX1 + "-" + hsl.locationY1);
                     }
                     else
                     {
                         hsl.WriteInt(hsl.locationX1, 0);
                         hsl.WriteInt(hsl.locationY1, 0);
+                        ShowLog("写PLC工件1数据0:" + hsl.locationX1 + "-" + hsl.locationY1);
                     }
-                    ShowLog("写PLC工件1数据" + flag + ":" + hsl.locationX1 + "-" + hsl.locationY1);
                 }
                 else
                 {
@@ -4462,195 +4472,434 @@ namespace Panasonic_SmartClean
                             {
                                 hsl.WriteInt(hsl.locationX2, 1);
                                 hsl.WriteInt(hsl.locationY2, 2);
+                                ShowLog("写PLC工件2数据1:" + hsl.locationX2 + "-" + hsl.locationY2);
                             }
                             else
                             {
                                 hsl.WriteInt(hsl.locationX2, 0);
                                 hsl.WriteInt(hsl.locationY2, 0);
+                                ShowLog("写PLC工件2数据0:" + hsl.locationX2 + "-" + hsl.locationY2);
                             }
-                            ShowLog("写PLC工件2数据" + flag + ":" + hsl.locationX2 + "-" + hsl.locationY2);
                             break;
                         case "3":
                             if (flag == "1")
                             {
                                 hsl.WriteInt(hsl.locationX3, 1);
                                 hsl.WriteInt(hsl.locationY3, 3);
+                                ShowLog("写PLC工件3数据1:" + hsl.locationX3 + "-" + hsl.locationY3);
                             }
                             else
                             {
                                 hsl.WriteInt(hsl.locationX3, 0);
                                 hsl.WriteInt(hsl.locationY3, 0);
+                                ShowLog("写PLC工件3数据0:" + hsl.locationX3 + "-" + hsl.locationY3);
                             }
-                            ShowLog("写PLC工件3数据" + flag + ":" + hsl.locationX3 + "-" + hsl.locationY3);
                             break;
                         case "4":
                             if (flag == "1")
                             {
                                 hsl.WriteInt(hsl.locationX4, 1);
                                 hsl.WriteInt(hsl.locationY4, 4);
+                                ShowLog("写PLC工件4数据1:" + hsl.locationX4 + "-" + hsl.locationY4);
                             }
                             else
                             {
                                 hsl.WriteInt(hsl.locationX4, 0);
                                 hsl.WriteInt(hsl.locationY4, 0);
+                                ShowLog("写PLC工件4数据0:" + hsl.locationX4 + "-" + hsl.locationY4);
                             }
-                            ShowLog("写PLC工件4数据" + flag + ":" + hsl.locationX4 + "-" + hsl.locationY4);
                             break;
                         case "5":
                             if (flag == "1")
                             {
-                                hsl.WriteInt(hsl.locationX5, 2);
-                                hsl.WriteInt(hsl.locationY5, 1);
+                                hsl.WriteInt(hsl.locationX5, 1);
+                                hsl.WriteInt(hsl.locationY5, 5);
+                                ShowLog("写PLC工件5数据1:" + hsl.locationX5 + "-" + hsl.locationY5);
                             }
                             else
                             {
                                 hsl.WriteInt(hsl.locationX5, 0);
                                 hsl.WriteInt(hsl.locationY5, 0);
+                                ShowLog("写PLC工件5数据0:" + hsl.locationX5 + "-" + hsl.locationY5);
                             }
-                            ShowLog("写PLC工件5数据" + flag + ":" + hsl.locationX5 + "-" + hsl.locationY5);
                             break;
                         case "6":
                             if (flag == "1")
                             {
-                                hsl.WriteInt(hsl.locationX6, 2);
-                                hsl.WriteInt(hsl.locationY6, 2);
+                                hsl.WriteInt(hsl.locationX6, 1);
+                                hsl.WriteInt(hsl.locationY6, 6);
+                                ShowLog("写PLC工件6数据1:" + hsl.locationX6 + "-" + hsl.locationY6);
                             }
                             else
                             {
                                 hsl.WriteInt(hsl.locationX6, 0);
                                 hsl.WriteInt(hsl.locationY6, 0);
+                                ShowLog("写PLC工件6数据0:" + hsl.locationX6 + "-" + hsl.locationY6);
                             }
-                            ShowLog("写PLC工件6数据" + flag + ":" + hsl.locationX6 + "-" + hsl.locationY6);
                             break;
                         case "7":
                             if (flag == "1")
                             {
-                                hsl.WriteInt(hsl.locationX7, 2);
-                                hsl.WriteInt(hsl.locationY7, 3);
+                                hsl.WriteInt(hsl.locationX7, 1);
+                                hsl.WriteInt(hsl.locationY7, 7);
+                                ShowLog("写PLC工件7数据1:" + hsl.locationX7 + "-" + hsl.locationY7);
                             }
                             else
                             {
                                 hsl.WriteInt(hsl.locationX7, 0);
                                 hsl.WriteInt(hsl.locationY7, 0);
+                                ShowLog("写PLC工件7数据0:" + hsl.locationX7 + "-" + hsl.locationY7);
                             }
-                            ShowLog("写PLC工件7数据" + flag + ":" + hsl.locationX7 + "-" + hsl.locationY7);
                             break;
                         case "8":
                             if (flag == "1")
                             {
-                                hsl.WriteInt(hsl.locationX8, 2);
-                                hsl.WriteInt(hsl.locationY8, 4);
+                                hsl.WriteInt(hsl.locationX8, 1);
+                                hsl.WriteInt(hsl.locationY8, 8);
+                                ShowLog("写PLC工件8数据1:" + hsl.locationX8 + "-" + hsl.locationY8);
                             }
                             else
                             {
                                 hsl.WriteInt(hsl.locationX8, 0);
                                 hsl.WriteInt(hsl.locationY8, 0);
+                                ShowLog("写PLC工件8数据0:" + hsl.locationX8 + "-" + hsl.locationY8);
                             }
-                            ShowLog("写PLC工件8数据" + flag + ":" + hsl.locationX8 + "-" + hsl.locationY8);
                             break;
                         case "9":
                             if (flag == "1")
                             {
-                                hsl.WriteInt(hsl.locationX9, 3);
+                                hsl.WriteInt(hsl.locationX9, 2);
                                 hsl.WriteInt(hsl.locationY9, 1);
+                                ShowLog("写PLC工件9数据1:" + hsl.locationX9 + "-" + hsl.locationY9);
                             }
                             else
                             {
                                 hsl.WriteInt(hsl.locationX9, 0);
                                 hsl.WriteInt(hsl.locationY9, 0);
+                                ShowLog("写PLC工件9数据0:" + hsl.locationX9 + "-" + hsl.locationY9);
                             }
-                            ShowLog("写PLC工件9数据" + flag + ":" + hsl.locationX9 + "-" + hsl.locationY9);
                             break;
                         case "10":
                             if (flag == "1")
                             {
-                                hsl.WriteInt(hsl.locationX10, 3);
+                                hsl.WriteInt(hsl.locationX10, 2);
                                 hsl.WriteInt(hsl.locationY10, 2);
+                                ShowLog("写PLC工件10数据1:" + hsl.locationX10 + "-" + hsl.locationY10);
                             }
                             else
                             {
                                 hsl.WriteInt(hsl.locationX10, 0);
                                 hsl.WriteInt(hsl.locationY10, 0);
+                                ShowLog("写PLC工件10数据0:" + hsl.locationX10 + "-" + hsl.locationY10);
                             }
-                            ShowLog("写PLC工件10数据" + flag + ":" + hsl.locationX10 + "-" + hsl.locationY10);
                             break;
                         case "11":
                             if (flag == "1")
                             {
-                                hsl.WriteInt(hsl.locationX11, 3);
+                                hsl.WriteInt(hsl.locationX11, 2);
                                 hsl.WriteInt(hsl.locationY11, 3);
+                                ShowLog("写PLC工件11数据1:" + hsl.locationX11 + "-" + hsl.locationY11);
                             }
                             else
                             {
                                 hsl.WriteInt(hsl.locationX11, 0);
                                 hsl.WriteInt(hsl.locationY11, 0);
+                                ShowLog("写PLC工件11数据0:" + hsl.locationX11 + "-" + hsl.locationY11);
                             }
-                            ShowLog("写PLC工件11数据" + flag + ":" + hsl.locationX11 + "-" + hsl.locationY11);
                             break;
                         case "12":
                             if (flag == "1")
                             {
-                                hsl.WriteInt(hsl.locationX12, 3);
+                                hsl.WriteInt(hsl.locationX12, 2);
                                 hsl.WriteInt(hsl.locationY12, 4);
+                                ShowLog("写PLC工件12数据1:" + hsl.locationX12 + "-" + hsl.locationY12);
                             }
                             else
                             {
                                 hsl.WriteInt(hsl.locationX12, 0);
                                 hsl.WriteInt(hsl.locationY12, 0);
+                                ShowLog("写PLC工件12数据0:" + hsl.locationX12 + "-" + hsl.locationY12);
                             }
-                            ShowLog("写PLC工件12数据" + flag + ":" + hsl.locationX12 + "-" + hsl.locationY12);
                             break;
                         case "13":
                             if (flag == "1")
                             {
-                                hsl.WriteInt(hsl.locationX13, 4);
-                                hsl.WriteInt(hsl.locationY13, 1);
+                                hsl.WriteInt(hsl.locationX13, 2);
+                                hsl.WriteInt(hsl.locationY13, 5);
+                                ShowLog("写PLC工件13数据1:" + hsl.locationX13 + "-" + hsl.locationY13);
                             }
                             else
                             {
                                 hsl.WriteInt(hsl.locationX13, 0);
                                 hsl.WriteInt(hsl.locationY13, 0);
+                                ShowLog("写PLC工件13数据0:" + hsl.locationX13 + "-" + hsl.locationY13);
                             }
-                            ShowLog("写PLC工件13数据" + flag + ":" + hsl.locationX13 + "-" + hsl.locationY13);
                             break;
                         case "14":
                             if (flag == "1")
                             {
-                                hsl.WriteInt(hsl.locationX14, 4);
-                                hsl.WriteInt(hsl.locationY14, 2);
+                                hsl.WriteInt(hsl.locationX14, 2);
+                                hsl.WriteInt(hsl.locationY14, 6);
+                                ShowLog("写PLC工件14数据1:" + hsl.locationX14 + "-" + hsl.locationY14);
                             }
                             else
                             {
                                 hsl.WriteInt(hsl.locationX14, 0);
                                 hsl.WriteInt(hsl.locationY14, 0);
+                                ShowLog("写PLC工件14数据0:" + hsl.locationX14 + "-" + hsl.locationY14);
                             }
-                            ShowLog("写PLC工件14数据" + flag + ":" + hsl.locationX14 + "-" + hsl.locationY14);
                             break;
                         case "15":
                             if (flag == "1")
                             {
-                                hsl.WriteInt(hsl.locationX15, 4);
-                                hsl.WriteInt(hsl.locationY15, 3);
+                                hsl.WriteInt(hsl.locationX15, 2);
+                                hsl.WriteInt(hsl.locationY15, 7);
+                                ShowLog("写PLC工件15数据1:" + hsl.locationX15 + "-" + hsl.locationY15);
                             }
                             else
                             {
                                 hsl.WriteInt(hsl.locationX15, 0);
                                 hsl.WriteInt(hsl.locationY15, 0);
+                                ShowLog("写PLC工件15数据0:" + hsl.locationX15 + "-" + hsl.locationY15);
                             }
-                            ShowLog("写PLC工件15数据" + flag + ":" + hsl.locationX15 + "-" + hsl.locationY15);
                             break;
                         case "16":
                             if (flag == "1")
                             {
-                                hsl.WriteInt(hsl.locationX16, 4);
-                                hsl.WriteInt(hsl.locationY16, 4);
+                                hsl.WriteInt(hsl.locationX16, 2);
+                                hsl.WriteInt(hsl.locationY16, 8);
+                                ShowLog("写PLC工件16数据1:" + hsl.locationX16 + "-" + hsl.locationY16);
                             }
                             else
                             {
                                 hsl.WriteInt(hsl.locationX16, 0);
                                 hsl.WriteInt(hsl.locationY16, 0);
+                                ShowLog("写PLC工件16数据0:" + hsl.locationX16 + "-" + hsl.locationY16);
                             }
-                            ShowLog("写PLC工件16数据" + flag + ":" + hsl.locationX16 + "-" + hsl.locationY16);
+                            break;
+                        case "17":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX17, 3);
+                                hsl.WriteInt(hsl.locationY17, 1);
+                                ShowLog("写PLC工件17数据1:" + hsl.locationX17 + "-" + hsl.locationY17);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX17, 0);
+                                hsl.WriteInt(hsl.locationY17, 0);
+                                ShowLog("写PLC工件17数据0:" + hsl.locationX17 + "-" + hsl.locationY17);
+                            }
+                            break;
+                        case "18":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX18, 3);
+                                hsl.WriteInt(hsl.locationY18, 2);
+                                ShowLog("写PLC工件18数据1:" + hsl.locationX18 + "-" + hsl.locationY18);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX18, 0);
+                                hsl.WriteInt(hsl.locationY18, 0);
+                                ShowLog("写PLC工件18数据0:" + hsl.locationX18 + "-" + hsl.locationY18);
+                            }
+                            break;
+                        case "19":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX19, 3);
+                                hsl.WriteInt(hsl.locationY19, 3);
+                                ShowLog("写PLC工件19数据1:" + hsl.locationX19 + "-" + hsl.locationY19);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX19, 0);
+                                hsl.WriteInt(hsl.locationY19, 0);
+                                ShowLog("写PLC工件19数据0:" + hsl.locationX19 + "-" + hsl.locationY19);
+                            }
+                            break;
+                        case "20":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX20, 3);
+                                hsl.WriteInt(hsl.locationY20, 4);
+                                ShowLog("写PLC工件20数据1:" + hsl.locationX20 + "-" + hsl.locationY20);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX20, 0);
+                                hsl.WriteInt(hsl.locationY20, 0);
+                                ShowLog("写PLC工件20数据0:" + hsl.locationX20 + "-" + hsl.locationY20);
+                            }
+                            break;
+                        case "21":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX21, 3);
+                                hsl.WriteInt(hsl.locationY21, 5);
+                                ShowLog("写PLC工件21数据1:" + hsl.locationX21 + "-" + hsl.locationY21);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX21, 0);
+                                hsl.WriteInt(hsl.locationY21, 0);
+                                ShowLog("写PLC工件21数据0:" + hsl.locationX21 + "-" + hsl.locationY21);
+                            }
+                            break;
+                        case "22":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX22, 3);
+                                hsl.WriteInt(hsl.locationY22, 6);
+                                ShowLog("写PLC工件22数据1:" + hsl.locationX22 + "-" + hsl.locationY22);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX22, 0);
+                                hsl.WriteInt(hsl.locationY22, 0);
+                                ShowLog("写PLC工件22数据0:" + hsl.locationX22 + "-" + hsl.locationY22);
+                            }
+                            break;
+                        case "23":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX23, 3);
+                                hsl.WriteInt(hsl.locationY23, 7);
+                                ShowLog("写PLC工件23数据1:" + hsl.locationX23 + "-" + hsl.locationY23);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX23, 0);
+                                hsl.WriteInt(hsl.locationY23, 0);
+                                ShowLog("写PLC工件23数据0:" + hsl.locationX23 + "-" + hsl.locationY23);
+                            }
+                            break;
+                        case "24":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX24, 3);
+                                hsl.WriteInt(hsl.locationY24, 8);
+                                ShowLog("写PLC工件24数据1:" + hsl.locationX24 + "-" + hsl.locationY24);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX24, 0);
+                                hsl.WriteInt(hsl.locationY24, 0);
+                                ShowLog("写PLC工件24数据0:" + hsl.locationX24 + "-" + hsl.locationY24);
+                            }
+                            break;
+                        case "25":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX25, 4);
+                                hsl.WriteInt(hsl.locationY25, 1);
+                                ShowLog("写PLC工件25数据1:" + hsl.locationX25 + "-" + hsl.locationY25);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX25, 0);
+                                hsl.WriteInt(hsl.locationY25, 0);
+                                ShowLog("写PLC工件25数据0:" + hsl.locationX25 + "-" + hsl.locationY25);
+                            }
+                            break;
+                        case "26":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX26, 4);
+                                hsl.WriteInt(hsl.locationY26, 2);
+                                ShowLog("写PLC工件26数据1:" + hsl.locationX26 + "-" + hsl.locationY26);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX26, 0);
+                                hsl.WriteInt(hsl.locationY26, 0);
+                                ShowLog("写PLC工件26数据0:" + hsl.locationX26 + "-" + hsl.locationY26);
+                            }
+                            break;
+                        case "27":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX27, 4);
+                                hsl.WriteInt(hsl.locationY27, 3);
+                                ShowLog("写PLC工件27数据1:" + hsl.locationX27 + "-" + hsl.locationY27);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX27, 0);
+                                hsl.WriteInt(hsl.locationY27, 0);
+                                ShowLog("写PLC工件27数据0:" + hsl.locationX27 + "-" + hsl.locationY27);
+                            }
+                            break;
+                        case "28":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX28, 4);
+                                hsl.WriteInt(hsl.locationY28, 4);
+                                ShowLog("写PLC工件28数据1:" + hsl.locationX28 + "-" + hsl.locationY28);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX28, 0);
+                                hsl.WriteInt(hsl.locationY28, 0);
+                                ShowLog("写PLC工件28数据0:" + hsl.locationX28 + "-" + hsl.locationY28);
+                            }
+                            break;
+                        case "29":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX29, 4);
+                                hsl.WriteInt(hsl.locationY29, 5);
+                                ShowLog("写PLC工件29数据1:" + hsl.locationX29 + "-" + hsl.locationY29);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX29, 0);
+                                hsl.WriteInt(hsl.locationY29, 0);
+                                ShowLog("写PLC工件29数据0:" + hsl.locationX29 + "-" + hsl.locationY29);
+                            }
+                            break;
+                        case "30":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX30, 4);
+                                hsl.WriteInt(hsl.locationY30, 6);
+                                ShowLog("写PLC工件30数据1:" + hsl.locationX30 + "-" + hsl.locationY30);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX30, 0);
+                                hsl.WriteInt(hsl.locationY30, 0);
+                                ShowLog("写PLC工件30数据0:" + hsl.locationX30 + "-" + hsl.locationY30);
+                            }
+                            break;
+                        case "31":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX31, 4);
+                                hsl.WriteInt(hsl.locationY31, 7);
+                                ShowLog("写PLC工件31数据1:" + hsl.locationX31 + "-" + hsl.locationY31);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX31, 0);
+                                hsl.WriteInt(hsl.locationY31, 0);
+                                ShowLog("写PLC工件31数据0:" + hsl.locationX31 + "-" + hsl.locationY31);
+                            }
+                            break;
+                        case "32":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX32, 4);
+                                hsl.WriteInt(hsl.locationY32, 8);
+                                ShowLog("写PLC工件32数据1:" + hsl.locationX32 + "-" + hsl.locationY32);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX32, 0);
+                                hsl.WriteInt(hsl.locationY32, 0);
+                                ShowLog("写PLC工件32数据0:" + hsl.locationX32 + "-" + hsl.locationY32);
+                            }
                             break;
                     }
                 }

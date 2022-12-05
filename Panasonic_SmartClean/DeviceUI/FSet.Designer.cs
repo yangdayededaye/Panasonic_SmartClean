@@ -45,10 +45,14 @@
             this.lbImagePath = new Sunny.UI.UILabel();
             this.btnImagePath = new Sunny.UI.UISymbolButton();
             this.btnVisonProcess = new Sunny.UI.UISymbolButton();
+            this.uiGroupBox5 = new Sunny.UI.UIGroupBox();
+            this.lbMesFilePath = new Sunny.UI.UILabel();
+            this.uiSymbolButton1 = new Sunny.UI.UISymbolButton();
             this.uiGroupBox1.SuspendLayout();
             this.uiGroupBox2.SuspendLayout();
             this.uiGroupBox3.SuspendLayout();
             this.uiGroupBox4.SuspendLayout();
+            this.uiGroupBox5.SuspendLayout();
             this.SuspendLayout();
             // 
             // SaveDays
@@ -208,7 +212,7 @@
             this.uiGroupBox3.Controls.Add(this.button4);
             this.uiGroupBox3.Controls.Add(this.uiTextBox5);
             this.uiGroupBox3.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.uiGroupBox3.Location = new System.Drawing.Point(278, 353);
+            this.uiGroupBox3.Location = new System.Drawing.Point(278, 461);
             this.uiGroupBox3.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.uiGroupBox3.MinimumSize = new System.Drawing.Size(1, 1);
             this.uiGroupBox3.Name = "uiGroupBox3";
@@ -225,7 +229,7 @@
             this.uiGroupBox4.Controls.Add(this.lbImagePath);
             this.uiGroupBox4.Controls.Add(this.btnImagePath);
             this.uiGroupBox4.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.uiGroupBox4.Location = new System.Drawing.Point(278, 223);
+            this.uiGroupBox4.Location = new System.Drawing.Point(278, 210);
             this.uiGroupBox4.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.uiGroupBox4.MinimumSize = new System.Drawing.Size(1, 1);
             this.uiGroupBox4.Name = "uiGroupBox4";
@@ -282,10 +286,56 @@
             this.btnVisonProcess.ZoomScaleRect = new System.Drawing.Rectangle(0, 0, 0, 0);
             this.btnVisonProcess.Click += new System.EventHandler(this.btnVisonProcess_Click);
             // 
+            // uiGroupBox5
+            // 
+            this.uiGroupBox5.Controls.Add(this.lbMesFilePath);
+            this.uiGroupBox5.Controls.Add(this.uiSymbolButton1);
+            this.uiGroupBox5.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.uiGroupBox5.Location = new System.Drawing.Point(278, 330);
+            this.uiGroupBox5.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.uiGroupBox5.MinimumSize = new System.Drawing.Size(1, 1);
+            this.uiGroupBox5.Name = "uiGroupBox5";
+            this.uiGroupBox5.Padding = new System.Windows.Forms.Padding(0, 32, 0, 0);
+            this.uiGroupBox5.Size = new System.Drawing.Size(633, 110);
+            this.uiGroupBox5.Style = Sunny.UI.UIStyle.Custom;
+            this.uiGroupBox5.TabIndex = 137;
+            this.uiGroupBox5.Text = "共享文件存储路径";
+            this.uiGroupBox5.TextAlignment = System.Drawing.ContentAlignment.MiddleCenter;
+            this.uiGroupBox5.ZoomScaleRect = new System.Drawing.Rectangle(0, 0, 0, 0);
+            // 
+            // lbMesFilePath
+            // 
+            this.lbMesFilePath.Font = new System.Drawing.Font("微软雅黑", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.lbMesFilePath.Location = new System.Drawing.Point(119, 47);
+            this.lbMesFilePath.Name = "lbMesFilePath";
+            this.lbMesFilePath.Size = new System.Drawing.Size(497, 34);
+            this.lbMesFilePath.Style = Sunny.UI.UIStyle.Custom;
+            this.lbMesFilePath.TabIndex = 89;
+            this.lbMesFilePath.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lbMesFilePath.ZoomScaleRect = new System.Drawing.Rectangle(0, 0, 0, 0);
+            // 
+            // uiSymbolButton1
+            // 
+            this.uiSymbolButton1.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.uiSymbolButton1.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.uiSymbolButton1.Location = new System.Drawing.Point(20, 45);
+            this.uiSymbolButton1.MinimumSize = new System.Drawing.Size(1, 1);
+            this.uiSymbolButton1.Name = "uiSymbolButton1";
+            this.uiSymbolButton1.Radius = 20;
+            this.uiSymbolButton1.Size = new System.Drawing.Size(93, 40);
+            this.uiSymbolButton1.Style = Sunny.UI.UIStyle.Custom;
+            this.uiSymbolButton1.Symbol = 61528;
+            this.uiSymbolButton1.TabIndex = 85;
+            this.uiSymbolButton1.Text = "选择";
+            this.uiSymbolButton1.TipsFont = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.uiSymbolButton1.ZoomScaleRect = new System.Drawing.Rectangle(0, 0, 0, 0);
+            this.uiSymbolButton1.Click += new System.EventHandler(this.uiSymbolButton1_Click);
+            // 
             // FSet
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.ClientSize = new System.Drawing.Size(945, 600);
+            this.ClientSize = new System.Drawing.Size(940, 600);
+            this.Controls.Add(this.uiGroupBox5);
             this.Controls.Add(this.btnVisonProcess);
             this.Controls.Add(this.uiGroupBox4);
             this.Controls.Add(this.uiGroupBox3);
@@ -308,6 +358,7 @@
             this.uiGroupBox2.ResumeLayout(false);
             this.uiGroupBox3.ResumeLayout(false);
             this.uiGroupBox4.ResumeLayout(false);
+            this.uiGroupBox5.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -351,6 +402,9 @@
 #pragma warning disable CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UISymbolButton”(是否缺少程序集引用?)
         private Sunny.UI.UISymbolButton btnImagePath;
         private Sunny.UI.UISymbolButton btnVisonProcess;
+        private Sunny.UI.UIGroupBox uiGroupBox5;
+        private Sunny.UI.UILabel lbMesFilePath;
+        private Sunny.UI.UISymbolButton uiSymbolButton1;
 #pragma warning restore CS0234 // 命名空间“Sunny.UI”中不存在类型或命名空间名“UISymbolButton”(是否缺少程序集引用?)
     }
 }

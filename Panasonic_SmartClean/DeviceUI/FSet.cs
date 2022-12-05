@@ -31,6 +31,7 @@ namespace Panasonic_SmartClean.DeviceUI
             {
                 lbTitle.Text = SoftConfig.ini.IniReadValue("SOFT", "Sol");
                 lbImagePath.Text = SoftConfig.ini.IniReadValue("SOFT", "ImagePath")+ "\\Image";
+                lbMesFilePath.Text = SoftConfig.ini.IniReadValue("SOFT", "MesFilePath");
                 cbBeforeEnable.Checked = hsl.ReadBool("M57", 1)[0] ? true : false;
             }
             catch (Exception ex)
@@ -104,6 +105,18 @@ namespace Panasonic_SmartClean.DeviceUI
         {
             FProcess f = new FProcess();
             f.ShowDialog();
+        }
+
+        private void uiSymbolButton1_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog folder = new FolderBrowserDialog();
+            folder.Description = "选择文件夹";  //提示的文字
+            if (folder.ShowDialog() == DialogResult.OK)
+            {
+                SoftConfig.ini.IniWriteValue("SOFT", "MesFilePath", folder.SelectedPath);
+                lbMesFilePath.Text = folder.SelectedPath;
+                ShowSuccessTip("修改成功");
+            }
         }
     }
 }
