@@ -8,12 +8,14 @@ namespace Panasonic_SmartClean.Model
 {
     public class IOModel
     {
-        public IOModel(int i,string s)
+        public IOModel(int i,string s,int a)
         {
             index = i;
             remark = s;
+            addressIndex = a;
         }
         public int index { get; set; }
         public string remark { get; set; }
+        public int addressIndex   { get; set; }
     }
 }

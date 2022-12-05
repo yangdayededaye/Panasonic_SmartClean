@@ -436,7 +436,7 @@ namespace Panasonic_SmartClean
                                             GetInfoByResultBig(strResult);
                                             break;
                                         case EWorkPieceType.superbig:
-
+                                            GetInfoByResultsuperbig(strResult);
                                             break;
                                         default:
                                             break;
@@ -868,7 +868,26 @@ namespace Panasonic_SmartClean
                             }
                         }
                         break;
+                    //2行3列
                     case EWorkPieceType.superbig:
+                        BoxWidth = iWidth / 2 - 5;
+                        BoxHeight = iHeight / 3 - 5;
+                        iIndex = 1;
+                        for (int i = 0; i < 2; i++)
+                        {
+                            for (int j = 0; j < 3; j++)
+                            {
+                                UILight l = new UILight();
+                                l.Width = BoxWidth;
+                                l.Height = BoxHeight;
+                                l.Location = new Point(i * BoxWidth - 2 + BoxWidth / 5, j * BoxHeight + BoxHeight / 4);
+                                l.Name = "light" + iIndex.ToString();
+                                l.State = UILightState.Off;
+                                l.OffColor = Color.FromArgb(140, 140, 140);
+                                pMap.Controls.Add(l);
+                                iIndex++;
+                            }
+                        }
                         break;
                     default:
                         break;
@@ -1042,6 +1061,33 @@ namespace Panasonic_SmartClean
                                             CmdNeedAdd.Enqueue(strResult);
                                             Invoke(new Action(() => {
                                                 btnType.Text = "大型";
+                                            }));
+                                        }
+                                        else
+                                        {
+                                            ShowLog("大型工位拍照获取结果失败：结果为空!", 1);
+                                            //strMessage = "获取结果失败：结果为空!";
+                                        }
+                                    }
+                                }
+                                break;
+                            case "超大型":
+                                CurrentType = EWorkPieceType.superbig;
+                                ioNameInfos = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetAllOutputNameInfo();
+                                if (ioNameInfos.Count != 0)//判断流程结果个数是否为0
+                                {
+                                    if (ioNameInfos[0].TypeName == IMVS_MODULE_BASE_DATA_TYPE.IMVS_GRAP_TYPE_STRING)//判断流程第一个结果是否为字符串类型
+                                    {
+                                        //获取流程结果
+                                        string strResult = GetProcessByID(workStatusInfo.nProcessID).ModuResult.GetOutputString(ioNameInfos[0].Name).astStringVal[0].strValue;
+                                        if (strResult != null)
+                                        {
+                                            ShowLog("超大型工位拍照获取结果:" + strResult, 0);
+                                            //解析输出
+                                            CmdNeedAdd.Enqueue(strResult);
+                                            Invoke(new Action(() =>
+                                            {
+                                                btnType.Text = "超大型";
                                             }));
                                         }
                                         else
@@ -4368,405 +4414,652 @@ namespace Panasonic_SmartClean
                 ShowLog("解析错误:" + ex.Message, 1);
             }
         }
+        public void GetInfoByResultsuperbig(string str)
+        {
+            try
+            {
+                string[] Str = str.Split(';');
+                string type = Str[0];//大中小 321
+                string PhotoTime = Str[1];//拍照次数
+                string info1 = Str[2];//1产品信息
 
-        //public void GetInfoByResultBig(string str)
-        //{
-        //    try
-        //    {
-        //        string[] Str = str.Split(';');
-        //        string type = Str[0];//大中小 321
-        //        string PhotoTime = Str[1];//拍照次数
-        //        string info1 = Str[2];//1产品信息
-        //        string info2 = Str[3];//2产品信息
-        //        string info3 = Str[4];//3产品信息
-        //        string info4 = Str[5];//4产品信息
-        //        WorkPiece wp1 = new WorkPiece();
-        //        WorkPiece wp2 = new WorkPiece();
-        //        WorkPiece wp3 = new WorkPiece();
-        //        WorkPiece wp4 = new WorkPiece();
+                WorkPiece wp1 = new WorkPiece();
+                string[] str1 = info1.Split(',');//分割产品信息1
+                string flag = str1[0];//产品1信息
+                string ocr1 = str1[2];
+                string code1 = str1[1];
+                wp1.Index = int.Parse(PhotoTime);
+                wp1.Type = CurrentType;
+                wp1.IsExist = flag == "1" ? true : false;
+                wp1.Ocr = ocr1;
+                wp1.BarCode = code1;
+                SoftConfig.lstWorkPiece.Add(wp1);
+                if (PhotoTime == "1")
+                {
+                    //初始化任务序号
+                    IndexOfTask = DateTime.Now.Year.ToString() + DateTime.Now.Month.ToString("00") + DateTime.Now.Day.ToString("00") + DateTime.Now.Hour.ToString("00") + DateTime.Now.Minute.ToString("00") + DateTime.Now.Second.ToString("00");
+                    //生成示意图
+                    GenMap(EWorkPieceType.superbig);
 
-        //        switch (PhotoTime)
-        //        {   //第一次拍照
-        //            case "1":
-        //                //初始化任务序号
-        //                IndexOfTask = DateTime.Now.Year.ToString() + DateTime.Now.Month.ToString("00") + DateTime.Now.Day.ToString("00") + DateTime.Now.Hour.ToString("00") + DateTime.Now.Minute.ToString("00") + DateTime.Now.Second.ToString("00");
-        //                //生成示意图
-        //                GenMap(EWorkPieceType.big);
+                    if (flag == "1")
+                    {
+                        hsl.WriteInt(hsl.locationX1, 1);
+                        hsl.WriteInt(hsl.locationY1, 1);
+                    }
+                    else
+                    {
+                        hsl.WriteInt(hsl.locationX1, 0);
+                        hsl.WriteInt(hsl.locationY1, 0);
+                    }
+                    ShowLog("写PLC工件1数据" + flag + ":" + hsl.locationX1 + "-" + hsl.locationY1);
+                }
+                else
+                {
+                    switch (PhotoTime)
+                    {
+                        case "2":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX2, 1);
+                                hsl.WriteInt(hsl.locationY2, 2);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX2, 0);
+                                hsl.WriteInt(hsl.locationY2, 0);
+                            }
+                            ShowLog("写PLC工件2数据" + flag + ":" + hsl.locationX2 + "-" + hsl.locationY2);
+                            break;
+                        case "3":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX3, 1);
+                                hsl.WriteInt(hsl.locationY3, 3);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX3, 0);
+                                hsl.WriteInt(hsl.locationY3, 0);
+                            }
+                            ShowLog("写PLC工件3数据" + flag + ":" + hsl.locationX3 + "-" + hsl.locationY3);
+                            break;
+                        case "4":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX4, 1);
+                                hsl.WriteInt(hsl.locationY4, 4);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX4, 0);
+                                hsl.WriteInt(hsl.locationY4, 0);
+                            }
+                            ShowLog("写PLC工件4数据" + flag + ":" + hsl.locationX4 + "-" + hsl.locationY4);
+                            break;
+                        case "5":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX5, 2);
+                                hsl.WriteInt(hsl.locationY5, 1);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX5, 0);
+                                hsl.WriteInt(hsl.locationY5, 0);
+                            }
+                            ShowLog("写PLC工件5数据" + flag + ":" + hsl.locationX5 + "-" + hsl.locationY5);
+                            break;
+                        case "6":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX6, 2);
+                                hsl.WriteInt(hsl.locationY6, 2);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX6, 0);
+                                hsl.WriteInt(hsl.locationY6, 0);
+                            }
+                            ShowLog("写PLC工件6数据" + flag + ":" + hsl.locationX6 + "-" + hsl.locationY6);
+                            break;
+                        case "7":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX7, 2);
+                                hsl.WriteInt(hsl.locationY7, 3);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX7, 0);
+                                hsl.WriteInt(hsl.locationY7, 0);
+                            }
+                            ShowLog("写PLC工件7数据" + flag + ":" + hsl.locationX7 + "-" + hsl.locationY7);
+                            break;
+                        case "8":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX8, 2);
+                                hsl.WriteInt(hsl.locationY8, 4);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX8, 0);
+                                hsl.WriteInt(hsl.locationY8, 0);
+                            }
+                            ShowLog("写PLC工件8数据" + flag + ":" + hsl.locationX8 + "-" + hsl.locationY8);
+                            break;
+                        case "9":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX9, 3);
+                                hsl.WriteInt(hsl.locationY9, 1);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX9, 0);
+                                hsl.WriteInt(hsl.locationY9, 0);
+                            }
+                            ShowLog("写PLC工件9数据" + flag + ":" + hsl.locationX9 + "-" + hsl.locationY9);
+                            break;
+                        case "10":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX10, 3);
+                                hsl.WriteInt(hsl.locationY10, 2);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX10, 0);
+                                hsl.WriteInt(hsl.locationY10, 0);
+                            }
+                            ShowLog("写PLC工件10数据" + flag + ":" + hsl.locationX10 + "-" + hsl.locationY10);
+                            break;
+                        case "11":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX11, 3);
+                                hsl.WriteInt(hsl.locationY11, 3);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX11, 0);
+                                hsl.WriteInt(hsl.locationY11, 0);
+                            }
+                            ShowLog("写PLC工件11数据" + flag + ":" + hsl.locationX11 + "-" + hsl.locationY11);
+                            break;
+                        case "12":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX12, 3);
+                                hsl.WriteInt(hsl.locationY12, 4);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX12, 0);
+                                hsl.WriteInt(hsl.locationY12, 0);
+                            }
+                            ShowLog("写PLC工件12数据" + flag + ":" + hsl.locationX12 + "-" + hsl.locationY12);
+                            break;
+                        case "13":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX13, 4);
+                                hsl.WriteInt(hsl.locationY13, 1);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX13, 0);
+                                hsl.WriteInt(hsl.locationY13, 0);
+                            }
+                            ShowLog("写PLC工件13数据" + flag + ":" + hsl.locationX13 + "-" + hsl.locationY13);
+                            break;
+                        case "14":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX14, 4);
+                                hsl.WriteInt(hsl.locationY14, 2);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX14, 0);
+                                hsl.WriteInt(hsl.locationY14, 0);
+                            }
+                            ShowLog("写PLC工件14数据" + flag + ":" + hsl.locationX14 + "-" + hsl.locationY14);
+                            break;
+                        case "15":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX15, 4);
+                                hsl.WriteInt(hsl.locationY15, 3);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX15, 0);
+                                hsl.WriteInt(hsl.locationY15, 0);
+                            }
+                            ShowLog("写PLC工件15数据" + flag + ":" + hsl.locationX15 + "-" + hsl.locationY15);
+                            break;
+                        case "16":
+                            if (flag == "1")
+                            {
+                                hsl.WriteInt(hsl.locationX16, 4);
+                                hsl.WriteInt(hsl.locationY16, 4);
+                            }
+                            else
+                            {
+                                hsl.WriteInt(hsl.locationX16, 0);
+                                hsl.WriteInt(hsl.locationY16, 0);
+                            }
+                            ShowLog("写PLC工件16数据" + flag + ":" + hsl.locationX16 + "-" + hsl.locationY16);
+                            break;
+                    }
+                }
 
-        //                string[] str1 = info1.Split(',');//分割产品信息1
-        //                string flag1 = str1[0];//产品1信息
-        //                string ocr1 = str1[2];
-        //                string code1 = str1[1];
-        //                if (flag1 == "1")
-        //                {
-        //                    hsl.WriteInt(hsl.locationX1, 1);
-        //                    hsl.WriteInt(hsl.locationY1, 1);
-        //                }
-        //                else
-        //                {
-        //                    hsl.WriteInt(hsl.locationX1, 0);
-        //                    hsl.WriteInt(hsl.locationY1, 0);
-        //                }
+            }
+            catch (Exception ex)
+            {
+                ShowLog("解析错误:" + ex.Message, 1);
+            }
+        }
 
-        //                wp1.Index = 1;
-        //                wp1.Type = CurrentType;
-        //                wp1.IsExist = flag1 == "1" ? true : false;
-        //                wp1.Ocr = ocr1;
-        //                wp1.BarCode = code1;
-
-
-        //                string[] str2 = info2.Split(',');//分割产品信息2
-        //                string flag2 = str2[0];//产品2信息
-        //                string ocr2 = str2[2];
-        //                string code2 = str2[1];
-        //                if (flag2 == "1")
-        //                {
-        //                    hsl.WriteInt(hsl.locationX2, 2);
-        //                    hsl.WriteInt(hsl.locationY2, 1);
-        //                }
-        //                else
-        //                {
-        //                    hsl.WriteInt(hsl.locationX2, 0);
-        //                    hsl.WriteInt(hsl.locationY2, 0);
-        //                }
-
-        //                wp2.Index = 2;
-        //                wp2.Type = CurrentType;
-        //                wp2.IsExist = flag2 == "1" ? true : false;
-        //                wp2.Ocr = ocr2;
-        //                wp2.BarCode = code2;
-
-
-        //                string[] str3 = info3.Split(',');//分割产品信息3
-        //                string flag3 = str3[0];//产品2信息
-        //                string ocr3 = str3[2];
-        //                string code3 = str3[1];
-        //                if (flag3 == "1")
-        //                {
-        //                    hsl.WriteInt(hsl.locationX3, 1);
-        //                    hsl.WriteInt(hsl.locationY3, 2);
-        //                }
-        //                else
-        //                {
-        //                    hsl.WriteInt(hsl.locationX3, 0);
-        //                    hsl.WriteInt(hsl.locationY3, 0);
-        //                }
-
-        //                wp3.Index = 3;
-        //                wp3.Type = CurrentType;
-        //                wp3.IsExist = flag3 == "1" ? true : false;
-        //                wp3.Ocr = ocr3;
-        //                wp3.BarCode = code3;
-
-
-        //                string[] str4 = info4.Split(',');//分割产品信息4
-        //                string flag4 = str4[0];//产品4信息
-        //                string ocr4 = str4[2];
-        //                string code4 = str4[1];
-        //                if (flag4 == "1")
-        //                {
-        //                    hsl.WriteInt(hsl.locationX4, 2);
-        //                    hsl.WriteInt(hsl.locationY4, 2);
-        //                }
-        //                else
-        //                {
-        //                    hsl.WriteInt(hsl.locationX4, 0);
-        //                    hsl.WriteInt(hsl.locationY4, 0);
-        //                }
-
-        //                wp4.Index = 4;
-        //                wp4.Type = CurrentType;
-        //                wp4.IsExist = flag4 == "1" ? true : false;
-        //                wp4.Ocr = ocr4;
-        //                wp4.BarCode = code4;
-
-
-        //                SoftConfig.lstWorkPiece.Add(wp1);
-        //                SoftConfig.lstWorkPiece.Add(wp2);
-        //                SoftConfig.lstWorkPiece.Add(wp3);
-        //                SoftConfig.lstWorkPiece.Add(wp4);
-
-        //                break;
-
-        //            //第二次拍照
-        //            case "2":
-        //                string[] str5 = info1.Split(',');//分割产品信息5
-        //                string flag5 = str5[0];//产品5信息
-        //                string ocr5 = str5[2];
-        //                string code5 = str5[1];
-        //                if (flag5 == "1")
-        //                {
-        //                    hsl.WriteInt(hsl.locationX5, 3);
-        //                    hsl.WriteInt(hsl.locationY5, 1);
-        //                }
-        //                else
-        //                {
-        //                    hsl.WriteInt(hsl.locationX5, 0);
-        //                    hsl.WriteInt(hsl.locationY5, 0);
-        //                }
-        //                wp1.Index = 5;
-        //                wp1.Type = CurrentType;
-        //                wp1.IsExist = flag5 == "1" ? true : false;
-        //                wp1.Ocr = ocr5;
-        //                wp1.BarCode = code5;
-
-        //                string[] str6 = info2.Split(',');//分割产品信息6
-        //                string flag6 = str6[0];//产品6信息
-        //                string ocr6 = str6[2];
-        //                string code6 = str6[1];
-        //                if (flag6 == "1")
-        //                {
-        //                    hsl.WriteInt(hsl.locationX6, 4);
-        //                    hsl.WriteInt(hsl.locationY6, 1);
-        //                }
-        //                else
-        //                {
-        //                    hsl.WriteInt(hsl.locationX6, 0);
-        //                    hsl.WriteInt(hsl.locationY6, 0);
-        //                }
-        //                wp2.Index = 6;
-        //                wp2.Type = CurrentType;
-        //                wp2.IsExist = flag6 == "1" ? true : false;
-        //                wp2.Ocr = ocr6;
-        //                wp2.BarCode = code6;
-
-        //                string[] str7 = info3.Split(',');//分割产品信息7
-        //                string flag7 = str7[0];//产品7信息
-        //                string ocr7 = str7[2];
-        //                string code7 = str7[1];
-        //                if (flag7 == "1")
-        //                {
-        //                    hsl.WriteInt(hsl.locationX7, 3);
-        //                    hsl.WriteInt(hsl.locationY7, 2);
-        //                }
-        //                else
-        //                {
-        //                    hsl.WriteInt(hsl.locationX7, 0);
-        //                    hsl.WriteInt(hsl.locationY7, 0);
-        //                }
-        //                wp3.Index = 7;
-        //                wp3.Type = CurrentType;
-        //                wp3.IsExist = flag7 == "1" ? true : false;
-        //                wp3.Ocr = ocr7;
-        //                wp3.BarCode = code7;
-
-        //                string[] str8 = info4.Split(',');//分割产品信息8
-        //                string flag8 = str8[0];//产品8信息
-        //                string ocr8 = str8[2];
-        //                string code8 = str8[1];
-        //                if (flag8 == "1")
-        //                {
-        //                    hsl.WriteInt(hsl.locationX8, 4);
-        //                    hsl.WriteInt(hsl.locationY8, 2);
-        //                }
-        //                else
-        //                {
-        //                    hsl.WriteInt(hsl.locationX8, 0);
-        //                    hsl.WriteInt(hsl.locationY8, 0);
-        //                }
-        //                wp4.Index = 8;
-        //                wp4.Type = CurrentType;
-        //                wp4.IsExist = flag8 == "1" ? true : false;
-        //                wp4.Ocr = ocr8;
-        //                wp4.BarCode = code8;
-
-        //                SoftConfig.lstWorkPiece.Add(wp1);
-        //                SoftConfig.lstWorkPiece.Add(wp2);
-        //                SoftConfig.lstWorkPiece.Add(wp3);
-        //                SoftConfig.lstWorkPiece.Add(wp4);
-
-        //                break;
-
-
-        //            //第三次拍照
-
-        //            case "3":
-        //                string[] str9 = info1.Split(',');//分割产品信息9
-        //                string flag9 = str9[0];//产品9信息
-        //                string ocr9 = str9[2];
-        //                string code9 = str9[1];
-        //                if (flag9 == "1")
-        //                {
-        //                    hsl.WriteInt(hsl.locationX9, 1);
-        //                    hsl.WriteInt(hsl.locationY9, 3);
-        //                }
-        //                else
-        //                {
-        //                    hsl.WriteInt(hsl.locationX9, 0);
-        //                    hsl.WriteInt(hsl.locationY9, 0);
-        //                }
-        //                wp1.Index = 9;
-        //                wp1.Type = CurrentType;
-        //                wp1.IsExist = flag9 == "1" ? true : false;
-        //                wp1.Ocr = ocr9;
-        //                wp1.BarCode = code9;
-
-        //                string[] str10 = info2.Split(',');//分割产品信息10
-        //                string flag10 = str10[0];//产品10信息
-        //                string ocr10 = str10[2];
-        //                string code10 = str10[1];
-        //                if (flag10 == "1")
-        //                {
-        //                    hsl.WriteInt(hsl.locationX10, 2);
-        //                    hsl.WriteInt(hsl.locationY10, 3);
-        //                }
-        //                else
-        //                {
-        //                    hsl.WriteInt(hsl.locationX10, 0);
-        //                    hsl.WriteInt(hsl.locationY10, 0);
-        //                }
-        //                wp2.Index = 10;
-        //                wp2.Type = CurrentType;
-        //                wp2.IsExist = flag10 == "1" ? true : false;
-        //                wp2.Ocr = ocr10;
-        //                wp2.BarCode = code10;
-
-        //                string[] str11 = info3.Split(',');//分割产品信息11
-        //                string flag11 = str11[0];//产品11信息
-        //                string ocr11 = str11[2];
-        //                string code11 = str11[1];
-        //                if (flag11 == "1")
-        //                {
-        //                    hsl.WriteInt(hsl.locationX11, 1);
-        //                    hsl.WriteInt(hsl.locationY11, 4);
-        //                }
-        //                else
-        //                {
-        //                    hsl.WriteInt(hsl.locationX11, 0);
-        //                    hsl.WriteInt(hsl.locationY11, 0);
-        //                }
-        //                wp3.Index = 11;
-        //                wp3.Type = CurrentType;
-        //                wp3.IsExist = flag11 == "1" ? true : false;
-        //                wp3.Ocr = ocr11;
-        //                wp3.BarCode = code11;
-
-        //                string[] str12 = info4.Split(',');//分割产品信息12
-        //                string flag12 = str12[0];//产品12信息
-        //                string ocr12 = str12[2];
-        //                string code12 = str12[1];
-        //                if (flag12 == "1")
-        //                {
-        //                    hsl.WriteInt(hsl.locationX12, 2);
-        //                    hsl.WriteInt(hsl.locationY12, 4);
-        //                }
-        //                else
-        //                {
-        //                    hsl.WriteInt(hsl.locationX12, 0);
-        //                    hsl.WriteInt(hsl.locationY12, 0);
-        //                }
-        //                wp4.Index = 12;
-        //                wp4.Type = CurrentType;
-        //                wp4.IsExist = flag12 == "1" ? true : false;
-        //                wp4.Ocr = ocr12;
-        //                wp4.BarCode = code12;
-
-        //                SoftConfig.lstWorkPiece.Add(wp1);
-        //                SoftConfig.lstWorkPiece.Add(wp2);
-        //                SoftConfig.lstWorkPiece.Add(wp3);
-        //                SoftConfig.lstWorkPiece.Add(wp4);
-
-        //                break;
-
-
-        //            //第四次拍照
-
-        //            case "4":
-        //                string[] str13 = info1.Split(',');//分割产品信息13
-        //                string flag13 = str13[0];//产品13信息
-        //                string ocr13 = str13[2];
-        //                string code13 = str13[1];
-        //                if (flag13 == "1")
-        //                {
-        //                    hsl.WriteInt(hsl.locationX13, 3);
-        //                    hsl.WriteInt(hsl.locationY13, 3);
-        //                }
-        //                else
-        //                {
-        //                    hsl.WriteInt(hsl.locationX13, 0);
-        //                    hsl.WriteInt(hsl.locationY13, 0);
-        //                }
-        //                wp1.Index = 13;
-        //                wp1.Type = CurrentType;
-        //                wp1.IsExist = flag13 == "1" ? true : false;
-        //                wp1.Ocr = ocr13;
-        //                wp1.BarCode = code13;
-
-        //                string[] str14 = info2.Split(',');//分割产品信息14
-        //                string flag14 = str14[0];//产品14信息
-        //                string ocr14 = str14[2];
-        //                string code14 = str14[1];
-        //                if (flag14 == "1")
-        //                {
-        //                    hsl.WriteInt(hsl.locationX14, 4);
-        //                    hsl.WriteInt(hsl.locationY14, 3);
-        //                }
-        //                else
-        //                {
-        //                    hsl.WriteInt(hsl.locationX14, 0);
-        //                    hsl.WriteInt(hsl.locationY14, 0);
-        //                }
-        //                wp2.Index = 14;
-        //                wp2.Type = CurrentType;
-        //                wp2.IsExist = flag14 == "1" ? true : false;
-        //                wp2.Ocr = ocr14;
-        //                wp2.BarCode = code14;
-
-        //                string[] str15 = info3.Split(',');//分割产品信息15
-        //                string flag15 = str15[0];//产品15信息
-        //                string ocr15 = str15[2];
-        //                string code15 = str15[1];
-        //                if (flag15 == "1")
-        //                {
-        //                    hsl.WriteInt(hsl.locationX15, 3);
-        //                    hsl.WriteInt(hsl.locationY15, 4);
-        //                }
-        //                else
-        //                {
-        //                    hsl.WriteInt(hsl.locationX15, 0);
-        //                    hsl.WriteInt(hsl.locationY15, 0);
-        //                }
-        //                wp3.Index = 15;
-        //                wp3.Type = CurrentType;
-        //                wp3.IsExist = flag15 == "1" ? true : false;
-        //                wp3.Ocr = ocr15;
-        //                wp3.BarCode = code15;
-
-        //                string[] str16 = info4.Split(',');//分割产品信息16
-        //                string flag16 = str16[0];//产品16信息
-        //                string ocr16 = str16[2];
-        //                string code16 = str16[1];
-        //                if (flag16 == "1")
-        //                {
-        //                    hsl.WriteInt(hsl.locationX16, 4);
-        //                    hsl.WriteInt(hsl.locationY16, 4);
-        //                }
-        //                else
-        //                {
-        //                    hsl.WriteInt(hsl.locationX16, 0);
-        //                    hsl.WriteInt(hsl.locationY16, 0);
-        //                }
-        //                wp4.Index = 16;
-        //                wp4.Type = CurrentType;
-        //                wp4.IsExist = flag16 == "1" ? true : false;
-        //                wp4.Ocr = ocr16;
-        //                wp4.BarCode = code16;
-
-
-        //                SoftConfig.lstWorkPiece.Add(wp1);
-        //                SoftConfig.lstWorkPiece.Add(wp2);
-        //                SoftConfig.lstWorkPiece.Add(wp3);
-        //                SoftConfig.lstWorkPiece.Add(wp4);
-
-        //                break;
-
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        ShowLog("解析错误:" + ex.Message, 1);
-        //    }
-        //}
+        //         public void GetInfoByResultsuperbig(string str)
+        //         {
+        //             try
+        //             {
+        //                 string[] Str = str.Split(';');
+        //                 string type = Str[0];//大中小 321
+        //                 string PhotoTime = Str[1];//拍照次数
+        //                 string info1 = Str[2];//1产品信息
+        //                 string info2 = Str[3];//2产品信息
+        //                 string info3 = Str[4];//3产品信息
+        //                 string info4 = Str[5];//4产品信息
+        //                 WorkPiece wp1 = new WorkPiece();
+        //                 WorkPiece wp2 = new WorkPiece();
+        //                 WorkPiece wp3 = new WorkPiece();
+        //                 WorkPiece wp4 = new WorkPiece();
+        // 
+        //                 switch (PhotoTime)
+        //                 {   //第一次拍照
+        //                     case "1":
+        //                         //初始化任务序号
+        //                         IndexOfTask = DateTime.Now.Year.ToString() + DateTime.Now.Month.ToString("00") + DateTime.Now.Day.ToString("00") + DateTime.Now.Hour.ToString("00") + DateTime.Now.Minute.ToString("00") + DateTime.Now.Second.ToString("00");
+        //                         //生成示意图
+        //                         GenMap(EWorkPieceType.big);
+        // 
+        //                         string[] str1 = info1.Split(',');//分割产品信息1
+        //                         string flag1 = str1[0];//产品1信息
+        //                         string ocr1 = str1[2];
+        //                         string code1 = str1[1];
+        //                         if (flag1 == "1")
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX1, 1);
+        //                             hsl.WriteInt(hsl.locationY1, 1);
+        //                         }
+        //                         else
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX1, 0);
+        //                             hsl.WriteInt(hsl.locationY1, 0);
+        //                         }
+        // 
+        //                         wp1.Index = 1;
+        //                         wp1.Type = CurrentType;
+        //                         wp1.IsExist = flag1 == "1" ? true : false;
+        //                         wp1.Ocr = ocr1;
+        //                         wp1.BarCode = code1;
+        // 
+        // 
+        //                         string[] str2 = info2.Split(',');//分割产品信息2
+        //                         string flag2 = str2[0];//产品2信息
+        //                         string ocr2 = str2[2];
+        //                         string code2 = str2[1];
+        //                         if (flag2 == "1")
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX2, 2);
+        //                             hsl.WriteInt(hsl.locationY2, 1);
+        //                         }
+        //                         else
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX2, 0);
+        //                             hsl.WriteInt(hsl.locationY2, 0);
+        //                         }
+        // 
+        //                         wp2.Index = 2;
+        //                         wp2.Type = CurrentType;
+        //                         wp2.IsExist = flag2 == "1" ? true : false;
+        //                         wp2.Ocr = ocr2;
+        //                         wp2.BarCode = code2;
+        // 
+        // 
+        //                         string[] str3 = info3.Split(',');//分割产品信息3
+        //                         string flag3 = str3[0];//产品2信息
+        //                         string ocr3 = str3[2];
+        //                         string code3 = str3[1];
+        //                         if (flag3 == "1")
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX3, 1);
+        //                             hsl.WriteInt(hsl.locationY3, 2);
+        //                         }
+        //                         else
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX3, 0);
+        //                             hsl.WriteInt(hsl.locationY3, 0);
+        //                         }
+        // 
+        //                         wp3.Index = 3;
+        //                         wp3.Type = CurrentType;
+        //                         wp3.IsExist = flag3 == "1" ? true : false;
+        //                         wp3.Ocr = ocr3;
+        //                         wp3.BarCode = code3;
+        // 
+        // 
+        //                         string[] str4 = info4.Split(',');//分割产品信息4
+        //                         string flag4 = str4[0];//产品4信息
+        //                         string ocr4 = str4[2];
+        //                         string code4 = str4[1];
+        //                         if (flag4 == "1")
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX4, 2);
+        //                             hsl.WriteInt(hsl.locationY4, 2);
+        //                         }
+        //                         else
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX4, 0);
+        //                             hsl.WriteInt(hsl.locationY4, 0);
+        //                         }
+        // 
+        //                         wp4.Index = 4;
+        //                         wp4.Type = CurrentType;
+        //                         wp4.IsExist = flag4 == "1" ? true : false;
+        //                         wp4.Ocr = ocr4;
+        //                         wp4.BarCode = code4;
+        // 
+        // 
+        //                         SoftConfig.lstWorkPiece.Add(wp1);
+        //                         SoftConfig.lstWorkPiece.Add(wp2);
+        //                         SoftConfig.lstWorkPiece.Add(wp3);
+        //                         SoftConfig.lstWorkPiece.Add(wp4);
+        // 
+        //                         break;
+        // 
+        //                     //第二次拍照
+        //                     case "2":
+        //                         string[] str5 = info1.Split(',');//分割产品信息5
+        //                         string flag5 = str5[0];//产品5信息
+        //                         string ocr5 = str5[2];
+        //                         string code5 = str5[1];
+        //                         if (flag5 == "1")
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX5, 3);
+        //                             hsl.WriteInt(hsl.locationY5, 1);
+        //                         }
+        //                         else
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX5, 0);
+        //                             hsl.WriteInt(hsl.locationY5, 0);
+        //                         }
+        //                         wp1.Index = 5;
+        //                         wp1.Type = CurrentType;
+        //                         wp1.IsExist = flag5 == "1" ? true : false;
+        //                         wp1.Ocr = ocr5;
+        //                         wp1.BarCode = code5;
+        // 
+        //                         string[] str6 = info2.Split(',');//分割产品信息6
+        //                         string flag6 = str6[0];//产品6信息
+        //                         string ocr6 = str6[2];
+        //                         string code6 = str6[1];
+        //                         if (flag6 == "1")
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX6, 4);
+        //                             hsl.WriteInt(hsl.locationY6, 1);
+        //                         }
+        //                         else
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX6, 0);
+        //                             hsl.WriteInt(hsl.locationY6, 0);
+        //                         }
+        //                         wp2.Index = 6;
+        //                         wp2.Type = CurrentType;
+        //                         wp2.IsExist = flag6 == "1" ? true : false;
+        //                         wp2.Ocr = ocr6;
+        //                         wp2.BarCode = code6;
+        // 
+        //                         string[] str7 = info3.Split(',');//分割产品信息7
+        //                         string flag7 = str7[0];//产品7信息
+        //                         string ocr7 = str7[2];
+        //                         string code7 = str7[1];
+        //                         if (flag7 == "1")
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX7, 3);
+        //                             hsl.WriteInt(hsl.locationY7, 2);
+        //                         }
+        //                         else
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX7, 0);
+        //                             hsl.WriteInt(hsl.locationY7, 0);
+        //                         }
+        //                         wp3.Index = 7;
+        //                         wp3.Type = CurrentType;
+        //                         wp3.IsExist = flag7 == "1" ? true : false;
+        //                         wp3.Ocr = ocr7;
+        //                         wp3.BarCode = code7;
+        // 
+        //                         string[] str8 = info4.Split(',');//分割产品信息8
+        //                         string flag8 = str8[0];//产品8信息
+        //                         string ocr8 = str8[2];
+        //                         string code8 = str8[1];
+        //                         if (flag8 == "1")
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX8, 4);
+        //                             hsl.WriteInt(hsl.locationY8, 2);
+        //                         }
+        //                         else
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX8, 0);
+        //                             hsl.WriteInt(hsl.locationY8, 0);
+        //                         }
+        //                         wp4.Index = 8;
+        //                         wp4.Type = CurrentType;
+        //                         wp4.IsExist = flag8 == "1" ? true : false;
+        //                         wp4.Ocr = ocr8;
+        //                         wp4.BarCode = code8;
+        // 
+        //                         SoftConfig.lstWorkPiece.Add(wp1);
+        //                         SoftConfig.lstWorkPiece.Add(wp2);
+        //                         SoftConfig.lstWorkPiece.Add(wp3);
+        //                         SoftConfig.lstWorkPiece.Add(wp4);
+        // 
+        //                         break;
+        // 
+        // 
+        //                     //第三次拍照
+        // 
+        //                     case "3":
+        //                         string[] str9 = info1.Split(',');//分割产品信息9
+        //                         string flag9 = str9[0];//产品9信息
+        //                         string ocr9 = str9[2];
+        //                         string code9 = str9[1];
+        //                         if (flag9 == "1")
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX9, 1);
+        //                             hsl.WriteInt(hsl.locationY9, 3);
+        //                         }
+        //                         else
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX9, 0);
+        //                             hsl.WriteInt(hsl.locationY9, 0);
+        //                         }
+        //                         wp1.Index = 9;
+        //                         wp1.Type = CurrentType;
+        //                         wp1.IsExist = flag9 == "1" ? true : false;
+        //                         wp1.Ocr = ocr9;
+        //                         wp1.BarCode = code9;
+        // 
+        //                         string[] str10 = info2.Split(',');//分割产品信息10
+        //                         string flag10 = str10[0];//产品10信息
+        //                         string ocr10 = str10[2];
+        //                         string code10 = str10[1];
+        //                         if (flag10 == "1")
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX10, 2);
+        //                             hsl.WriteInt(hsl.locationY10, 3);
+        //                         }
+        //                         else
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX10, 0);
+        //                             hsl.WriteInt(hsl.locationY10, 0);
+        //                         }
+        //                         wp2.Index = 10;
+        //                         wp2.Type = CurrentType;
+        //                         wp2.IsExist = flag10 == "1" ? true : false;
+        //                         wp2.Ocr = ocr10;
+        //                         wp2.BarCode = code10;
+        // 
+        //                         string[] str11 = info3.Split(',');//分割产品信息11
+        //                         string flag11 = str11[0];//产品11信息
+        //                         string ocr11 = str11[2];
+        //                         string code11 = str11[1];
+        //                         if (flag11 == "1")
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX11, 1);
+        //                             hsl.WriteInt(hsl.locationY11, 4);
+        //                         }
+        //                         else
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX11, 0);
+        //                             hsl.WriteInt(hsl.locationY11, 0);
+        //                         }
+        //                         wp3.Index = 11;
+        //                         wp3.Type = CurrentType;
+        //                         wp3.IsExist = flag11 == "1" ? true : false;
+        //                         wp3.Ocr = ocr11;
+        //                         wp3.BarCode = code11;
+        // 
+        //                         string[] str12 = info4.Split(',');//分割产品信息12
+        //                         string flag12 = str12[0];//产品12信息
+        //                         string ocr12 = str12[2];
+        //                         string code12 = str12[1];
+        //                         if (flag12 == "1")
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX12, 2);
+        //                             hsl.WriteInt(hsl.locationY12, 4);
+        //                         }
+        //                         else
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX12, 0);
+        //                             hsl.WriteInt(hsl.locationY12, 0);
+        //                         }
+        //                         wp4.Index = 12;
+        //                         wp4.Type = CurrentType;
+        //                         wp4.IsExist = flag12 == "1" ? true : false;
+        //                         wp4.Ocr = ocr12;
+        //                         wp4.BarCode = code12;
+        // 
+        //                         SoftConfig.lstWorkPiece.Add(wp1);
+        //                         SoftConfig.lstWorkPiece.Add(wp2);
+        //                         SoftConfig.lstWorkPiece.Add(wp3);
+        //                         SoftConfig.lstWorkPiece.Add(wp4);
+        // 
+        //                         break;
+        // 
+        // 
+        //                     //第四次拍照
+        // 
+        //                     case "4":
+        //                         string[] str13 = info1.Split(',');//分割产品信息13
+        //                         string flag13 = str13[0];//产品13信息
+        //                         string ocr13 = str13[2];
+        //                         string code13 = str13[1];
+        //                         if (flag13 == "1")
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX13, 3);
+        //                             hsl.WriteInt(hsl.locationY13, 3);
+        //                         }
+        //                         else
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX13, 0);
+        //                             hsl.WriteInt(hsl.locationY13, 0);
+        //                         }
+        //                         wp1.Index = 13;
+        //                         wp1.Type = CurrentType;
+        //                         wp1.IsExist = flag13 == "1" ? true : false;
+        //                         wp1.Ocr = ocr13;
+        //                         wp1.BarCode = code13;
+        // 
+        //                         string[] str14 = info2.Split(',');//分割产品信息14
+        //                         string flag14 = str14[0];//产品14信息
+        //                         string ocr14 = str14[2];
+        //                         string code14 = str14[1];
+        //                         if (flag14 == "1")
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX14, 4);
+        //                             hsl.WriteInt(hsl.locationY14, 3);
+        //                         }
+        //                         else
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX14, 0);
+        //                             hsl.WriteInt(hsl.locationY14, 0);
+        //                         }
+        //                         wp2.Index = 14;
+        //                         wp2.Type = CurrentType;
+        //                         wp2.IsExist = flag14 == "1" ? true : false;
+        //                         wp2.Ocr = ocr14;
+        //                         wp2.BarCode = code14;
+        // 
+        //                         string[] str15 = info3.Split(',');//分割产品信息15
+        //                         string flag15 = str15[0];//产品15信息
+        //                         string ocr15 = str15[2];
+        //                         string code15 = str15[1];
+        //                         if (flag15 == "1")
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX15, 3);
+        //                             hsl.WriteInt(hsl.locationY15, 4);
+        //                         }
+        //                         else
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX15, 0);
+        //                             hsl.WriteInt(hsl.locationY15, 0);
+        //                         }
+        //                         wp3.Index = 15;
+        //                         wp3.Type = CurrentType;
+        //                         wp3.IsExist = flag15 == "1" ? true : false;
+        //                         wp3.Ocr = ocr15;
+        //                         wp3.BarCode = code15;
+        // 
+        //                         string[] str16 = info4.Split(',');//分割产品信息16
+        //                         string flag16 = str16[0];//产品16信息
+        //                         string ocr16 = str16[2];
+        //                         string code16 = str16[1];
+        //                         if (flag16 == "1")
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX16, 4);
+        //                             hsl.WriteInt(hsl.locationY16, 4);
+        //                         }
+        //                         else
+        //                         {
+        //                             hsl.WriteInt(hsl.locationX16, 0);
+        //                             hsl.WriteInt(hsl.locationY16, 0);
+        //                         }
+        //                         wp4.Index = 16;
+        //                         wp4.Type = CurrentType;
+        //                         wp4.IsExist = flag16 == "1" ? true : false;
+        //                         wp4.Ocr = ocr16;
+        //                         wp4.BarCode = code16;
+        // 
+        // 
+        //                         SoftConfig.lstWorkPiece.Add(wp1);
+        //                         SoftConfig.lstWorkPiece.Add(wp2);
+        //                         SoftConfig.lstWorkPiece.Add(wp3);
+        //                         SoftConfig.lstWorkPiece.Add(wp4);
+        // 
+        //                         break;
+        // 
+        //                 }
+        //             }
+        //             catch (Exception ex)
+        //             {
+        //                 ShowLog("解析错误:" + ex.Message, 1);
+        //             }
+        //         }
 
         private void FCleanNew_Resize(object sender, EventArgs e)
         {

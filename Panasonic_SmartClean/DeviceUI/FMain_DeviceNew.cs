@@ -84,7 +84,8 @@ namespace Panasonic_SmartClean
 
                     var vSmall = SoftConfig.db.VisonProcess.Where(x => x.Type == "小型").ToList();
                     var vBig = SoftConfig.db.VisonProcess.Where(x => x.Type == "大型").ToList();
-                    if ((vSmall != null && vSmall.Count > 0) &&(vBig != null && vBig.Count > 0))
+                    var vSuperBig = SoftConfig.db.VisonProcess.Where(x => x.Type == "超大型").ToList();
+                    if ((vSmall != null && vSmall.Count > 0) &&(vBig != null && vBig.Count > 0)&& (vSuperBig != null && vSuperBig.Count > 0))
                     {
                         //设置图像源 调用拍照流程
                         ImageSourceModuleTool imageSourceToolBig = (ImageSourceModuleTool)VmSolution.Instance[vBig[0].ProcessName+".图像源1"];
@@ -98,6 +99,12 @@ namespace Panasonic_SmartClean
                         imageSourceToolSmall.AddInputImageByPath(System.Environment.CurrentDirectory + "\\PreLoadSmall.jpg");
                         VmProcedure procedureSmall = VmSolution.Instance[vSmall[0].ProcessName] as VmProcedure;
                         procedureSmall.OnWorkEndStatusCallBack += VmProcedure_OnWorkEndStatusCallBack;
+
+                        ImageSourceModuleTool imageSourceToolSuperBig = (ImageSourceModuleTool)VmSolution.Instance[vSmall[0].ProcessName + ".图像源1"];
+                        imageSourceToolSuperBig.ModuParams.ImageSourceType = ImageSourceParam.ImageSourceTypeEnum.LocalImage;
+                        imageSourceToolSuperBig.AddInputImageByPath(System.Environment.CurrentDirectory + "\\PreLoadSuperBig.jpg");
+                        VmProcedure procedureSuperBig = VmSolution.Instance[vSmall[0].ProcessName] as VmProcedure;
+                        procedureSuperBig.OnWorkEndStatusCallBack += VmProcedure_OnWorkEndStatusCallBack;
 
                         if (procedureBig != null)
                         {
@@ -122,14 +129,28 @@ namespace Panasonic_SmartClean
                                 lg.SendCommand("等待小型回调", 0);
                             }
                         }
+                        if (procedureSuperBig != null)
+                        {
+                            lg.SendCommand("调用超大型", 0);
+                            IsPreLoadFinish = false;
+                            procedureSuperBig.Run();
+                            while (!IsPreLoadFinish)
+                            {
+                                Task.Delay(500);
+                                lg.SendCommand("等待超大型回调", 0);
+                            }
+                        }
 
                         //更换图像源 注销回调
                         imageSourceToolBig.ModuParams.ImageSourceType = ImageSourceParam.ImageSourceTypeEnum.Camera;
                         imageSourceToolBig.ModuParams.SetParamValue("CameraID", "27");
                         imageSourceToolSmall.ModuParams.ImageSourceType = ImageSourceParam.ImageSourceTypeEnum.Camera;
                         imageSourceToolSmall.ModuParams.SetParamValue("CameraID", "27");
+                        imageSourceToolSuperBig.ModuParams.ImageSourceType = ImageSourceParam.ImageSourceTypeEnum.Camera;
+                        imageSourceToolSuperBig.ModuParams.SetParamValue("CameraID", "27");
                         procedureBig.OnWorkEndStatusCallBack -= VmProcedure_OnWorkEndStatusCallBack;
                         procedureSmall.OnWorkEndStatusCallBack -= VmProcedure_OnWorkEndStatusCallBack;
+                        procedureSuperBig.OnWorkEndStatusCallBack -= VmProcedure_OnWorkEndStatusCallBack;
                     }
 
                     lightScan.State = UILightState.On;
@@ -235,6 +256,7 @@ namespace Panasonic_SmartClean
                 sr.Close();
                 fs.Close();
 
+                int addressIndex = 0;
                 finfo = new FileInfo(System.Environment.CurrentDirectory + "\\I.txt");
                 fs = finfo.Open(FileMode.OpenOrCreate,
                 FileAccess.ReadWrite);
@@ -248,14 +270,16 @@ namespace Panasonic_SmartClean
                         int.TryParse(strList.Split('=')[0], out iKey);
                         if (iKey != -1)
                         {
-                            SoftConfig._IMap.Add(new IOModel(iKey, strList.Split('=')[1]));
+                            SoftConfig._IMap.Add(new IOModel(iKey, strList.Split('=')[1], addressIndex));
                         }
                     }
                     strList = sr.ReadLine();
+                    addressIndex++;
                 }
                 sr.Close();
                 fs.Close();
 
+                addressIndex = 0;
                 finfo = new FileInfo(System.Environment.CurrentDirectory + "\\O.txt");
                 fs = finfo.Open(FileMode.OpenOrCreate,
                 FileAccess.ReadWrite);
@@ -269,10 +293,11 @@ namespace Panasonic_SmartClean
                         int.TryParse(strList.Split('=')[0], out iKey);
                         if (iKey != -1)
                         {
-                            SoftConfig._OMap.Add(new IOModel(iKey, strList.Split('=')[1]));
+                            SoftConfig._OMap.Add(new IOModel(iKey, strList.Split('=')[1], addressIndex));
                         }
                     }
                     strList = sr.ReadLine();
+                    addressIndex++;
                 }
                 sr.Close();
                 fs.Close();

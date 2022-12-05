@@ -44,7 +44,7 @@ namespace Panasonic_SmartClean
                         break;
                     }
                     UILedBulb u = new UILedBulb();
-                    u.Name = "l"+SoftConfig._IMap[iCount-1].index.ToString();
+                    u.Name = "l"+SoftConfig._IMap[iCount-1].addressIndex.ToString();
                     u.Size = new Size(iWidth/2,iHeight/2);
                     u.Location = new Point(j * (iWidth + 5) + 35 + iWidth / 4, i * (iHeight + 15) + 30 + iHeight / 3);
                     u.Color = System.Drawing.Color.DarkGray;
